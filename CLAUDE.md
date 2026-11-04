@@ -2,6 +2,8 @@
 
 Sukratu Labs' code-based motion-graphics templates. Each template is a GSAP timeline in a plain HTML page, rendered frame-by-frame to mp4 with Playwright + ffmpeg. **Why this exists:** Motion.so (motion.so) produced the original MyDesigner.gg launch film, but every iteration burned credits. This repo replaces it with a deterministic, free-to-re-render pipeline. Don't route new video work back to Motion unless the user asks for generative media (AI video, AI images, voiceover, generated music). Those need the Motion app or another generative tool.
 
+Project hub (status, open items, history for humans): Notion → Agent Project Hubs → **Video Generation** (https://app.notion.com/p/40ef3a2c1e9a81329167d2a2c228c2d3). Update its open items and version history after material changes, and add a row to the Agent Work Log.
+
 Read these before working:
 - `docs/HISTORY.md`: how the template was built, decisions, and what was tried and rejected
 - `docs/WORKFLOW.md`: the step-by-step for making a new film, including the QA checks
