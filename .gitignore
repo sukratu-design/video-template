@@ -11,3 +11,4 @@ diwali-film/vo.mp3
 diwali-film/render.log
 diwali-film/voiceover/shubh_t/
 diwali-film/voiceover/*.pcm
+__pycache__/
