@@ -108,17 +108,17 @@ const blurS=document.createElement('canvas');blurS.width=blurS.height=270;const 
 const blurB=document.createElement('canvas');blurB.width=W;blurB.height=H;const bbx=blurB.getContext('2d',{willReadFrequently:true});
 let outIm=null;
 function composite(target){
-  if(!PAPER)buildPaper();const{pr,pg,pb,dens,disp}=PAPER;
-  bsx.clearRect(0,0,270,270);bsx.filter='blur(1.6px)';bsx.drawImage(art,0,0,270,270);bsx.filter='none';
-  bbx.clearRect(0,0,W,H);bbx.imageSmoothingEnabled=true;bbx.imageSmoothingQuality='high';bbx.drawImage(blurS,0,0,W,H);
-  const A=actx.getImageData(0,0,W,H).data,B=bbx.getImageData(0,0,W,H).data;
+  /* Artwork is laid onto the paper with no pigment-bleed blur and no per-pixel edge displacement, so drawings and
+     captions keep clean edges. Paper grain mottling of the wash density is kept; the paper itself is unchanged. */
+  if(!PAPER)buildPaper();const{pr,pg,pb,dens}=PAPER;
+  const A=actx.getImageData(0,0,W,H).data;
   if(!outIm)outIm=target.createImageData(W,H);const O=outIm.data,k=1/255;
   for(let i=0,N=W*H;i<N;i++){
-    const o=i*4,j=(i+disp[i])*4,a=A[j+3]*k,ba=B[o+3]*k;let R=pr[i],G=pg[i],Bv=pb[i];
-    if(a>.004||ba>.012){
-      let cr,cg,cb;if(a>.004){cr=A[j];cg=A[j+1];cb=A[j+2]}else{cr=B[o];cg=B[o+1];cb=B[o+2]}
+    const o=i*4,a=A[o+3]*k;let R=pr[i],G=pg[i],Bv=pb[i];
+    if(a>.004){
+      const cr=A[o],cg=A[o+1],cb=A[o+2];
       const luma=(.3*cr+.59*cg+.11*cb)*k,ink=luma<.38?Math.min(1,(.38-luma)*5):0,dn=dens[i];
-      let d=a*(dn+(1-dn)*ink);const e=a-ba;if(e>0)d+=e*.62*(1-ink);else d-=e*.2*(1-ink*.75);if(d>1)d=1;
+      let d=a*(dn+(1-dn)*ink);if(d>1)d=1;
       R*=1-d*(1-cr*k);G*=1-d*(1-cg*k);Bv*=1-d*(1-cb*k);
     }
     O[o]=R;O[o+1]=G;O[o+2]=Bv;O[o+3]=255;

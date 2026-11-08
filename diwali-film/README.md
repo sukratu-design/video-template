@@ -25,3 +25,4 @@ Paste `cues_v3.js` over `captionCues` in `index.html`. Beat boundaries `B[]` (to
 - Hero diya position (`DX,DY,DS`) is shared by beats 1, 9 and 10 so the film loops.
 - Night washes cut glow holes with `destination-out` so lit windows read as light on a dark wash.
 - Not drawn: faces or deities (Rama and Lakshmi are named, shown by footprints, sandals and a lotus).
+- `composite()` lays the artwork on the paper with no pigment-bleed blur and no per-pixel edge displacement, so drawings and captions keep clean edges. Paper grain still mottles wash density. (The original `painted-film/` compositor keeps both effects.)
