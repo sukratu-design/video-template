@@ -1,3 +1,8 @@
 node_modules/
 *.mp4
 still_*.png
+!painted-film/examples/*.mp4
+painted-film/video.mp4
+painted-film/audio.wav
+painted-film/vo.mp3
+*.env

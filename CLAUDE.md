@@ -14,6 +14,7 @@ Read these before working:
 | Folder | Formats | Notes |
 |---|---|---|
 | `launch-film/` | 16:9 1920×1080 and 9:16 1080×1920 (Reels-safe), 30 fps, 30 s | Story: chaos → problem → stat → brand reveal → fix → proof → CTA |
+| `painted-film/` | 1:1 1080×1080, 30 fps, 68 s | Company School painted-watercolour explainer with Indian-English voiceover. Worked example: karma / "The Life of a Seed". Read `painted-film/STYLE.md`, `painted-film/README.md`, `docs/PAINTED-FILM-HISTORY.md` and the `painted-film` skill. |
 
 ## Hard rules
 1. **For a new film, edit `launch-film/content.js` only.** It holds copy, brand tokens, the wordmark path, the audio path, notifications, calendar cards and final slots. Touch `index.html` / `vertical.html` only if the story structure or timing changes. Make timing changes in **both** files, because they're parallel copies of the same timeline.
@@ -22,7 +23,8 @@ Read these before working:
 4. **Keep randomness seeded.** Card order, tile shatter, thrown-card angles and sphere stipple all use the seeded `rnd()`. Never use `Math.random()`, or renders stop matching each other.
 5. **Respect the 9:16 Reels safe zone.** Keep key text out of the bottom ~300 px (y > 1620) and the right ~130 px from y ≈ 1050–1650. The prompt bar, proof tags and end card are placed for this, so re-check them with the overlay command in `docs/WORKFLOW.md` after layout changes.
 6. **Respect the copy length limits** in `launch-film/README.md`, or text clips in 9:16.
-7. **Don't commit mp4s** (they're in .gitignore). Deliver renders to the user directly.
+7. **Don't commit mp4s** (they're in .gitignore). Deliver renders to the user directly. The one exception is the small, compressed reference examples in `painted-film/examples/`.
+9. **Never commit API keys** (e.g. Sarvam, ElevenLabs). Keys live in `~/*.env` files outside the repo.
 8. **Cloud workspace notes:** Playwright and Chromium are preinstalled, so never run `playwright install` there. A full render takes about 3–4 minutes per layout, so run it in the background. `npm i` is needed once per fresh clone.
 
 ## Brand facts (MyDesigner.gg)
