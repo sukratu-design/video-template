@@ -194,7 +194,7 @@ scenes.length=0;
 
 /* ===================== DIWALI: helpers ===================== */
 const B=[0,5.6,10.7,17.9,24.7,36.0,43.0,47.8,56.6,61.9,69.5]; // beat boundaries, set from the measured voiceover
-const DX=540,DY=750,DS=1.9; // the hero diya: same place in beats 1, 9 and 10 so the film loops
+const DX=540,DY=800,DS=1.9; // the hero diya: same place in beats 1, 9 and 10 so the film loops
 const flamePos=(x,y,s)=>({x:x+58*s,y:y-40*s});
 const NIGHT_TOP='#2E3452',NIGHT_BOT='#7580A0';
 function washShape(cx,cy,rx,ry,seed,rough=.05,n=44){const r=mulberry32(seed),pts=[];for(let i=0;i<n;i++){const a=i/n*TAU,k=1+(r()-.5)*rough*2+.03*Math.sin(a*3+seed);pts.push({x:cx+Math.cos(a)*rx*k,y:cy+Math.sin(a)*ry*k})}return pts}
@@ -235,7 +235,7 @@ const mkCam=()=>({zoom:1,focusX:540,focusY:540});
 
 /* ===================== BEAT 1: dusk, one lamp ===================== */
 {
-const wash=washShape(540,530,440,320,101,.05);
+const wash=washShape(540,600,440,300,101,.05);
 const st0={camera:mkCam(),wash:0,lit:0,title:1};
 addBeat('b1',B[0],B[1],st0,(tl,s)=>{
   tl.to(s,{wash:1,duration:1.6,ease:'power1.out'},0);
@@ -244,8 +244,8 @@ addBeat('b1',B[0],B[1],st0,(tl,s)=>{
   drift(tl,s,B[1]-B[0],1.04);
 },(ctx,st,lt)=>{
   camera(ctx,st,()=>{
-    nightWash(ctx,wash,{alpha:st.wash,y0:210,y1:850});
-    stars(ctx,31,26,200,260,880,520,st.wash);
+    nightWash(ctx,wash,{alpha:st.wash,y0:300,y1:900});
+    stars(ctx,31,26,200,340,880,640,st.wash);
     const fp=flamePos(DX,DY,DS);
     cutGlow(ctx,[{x:fp.x,y:fp.y,r:300*st.lit,a:.9*st.lit}]);
     groundWash(ctx,{x0:220,x1:860,y:DY+70,h:40,seed:130,shrub:{x:820,scale:1.1}});
@@ -510,7 +510,7 @@ const r10=mulberry32(1010);
 const field=[];[[70,420,340,356],[700,980,340,356],[90,380,640,656],[700,960,640,656]].forEach(([x0,x1,y0,y1],bi)=>{for(let i=0;i<4;i++)field.push({x:lerp(x0,x1,(i+.3+r10()*.4)/4),y:lerp(y0,y1,r10()),s:.62+r10()*.22,seed:1100+bi*10+i})});
 field.sort((a,b)=>Math.hypot(a.x-DX,a.y-DY)-Math.hypot(b.x-DX,b.y-DY));
 const st0={camera:mkCam(),a:0,b:0,field:0,p2:0,p3:0,fade:1,end:0,sig:0,...Object.fromEntries(field.map((_,i)=>['f'+i,0]))};
-const P2={x:230,y:800,s:1.35},P3={x:890,y:800,s:1.35};
+const P2={x:230,y:850,s:1.35},P3={x:890,y:850,s:1.35};
 addBeat('b10',B[9],B[10],st0,(tl,s)=>{
   tl.to(s,{p2:1,duration:1.0,ease:'power1.inOut'},1.1);tl.to(s,{a:1,duration:.5},2.1);
   tl.to(s,{p3:1,duration:1.0,ease:'power1.inOut'},2.0);tl.to(s,{b:1,duration:.5},3.0);
@@ -522,7 +522,7 @@ addBeat('b10',B[9],B[10],st0,(tl,s)=>{
   camera(ctx,st,()=>{
     groundWash(ctx,{x0:220,x1:860,y:DY+70,h:40,seed:130,shrub:{x:820,scale:1.1}});
     ctx.save();ctx.globalAlpha=st.fade;
-    groundWash(ctx,{x0:90,x1:990,y:P2.y+50,h:30,seed:1090,alpha:st.fade});
+    groundWash(ctx,{x0:90,x1:990,y:P2.y+45,h:30,seed:1090,alpha:st.fade});
     [[70,420,386],[700,980,386],[90,380,686],[700,960,686]].forEach(([a,b,y],k)=>groundWash(ctx,{x0:a-20,x1:b+30,y,h:22,seed:1050+k,alpha:st.fade}));
     field.forEach((f,i)=>diya(ctx,f.x,f.y,f.s,lt,{lit:st['f'+i],seed:f.seed}));
     diya(ctx,P2.x,P2.y,P2.s,lt,{lit:st.a,seed:1001});diya(ctx,P3.x,P3.y,P3.s,lt,{lit:st.b,seed:1002});
