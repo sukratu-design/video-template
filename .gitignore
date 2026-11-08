@@ -6,3 +6,8 @@ painted-film/video.mp4
 painted-film/audio.wav
 painted-film/vo.mp3
 *.env
+diwali-film/audio.wav
+diwali-film/vo.mp3
+diwali-film/render.log
+diwali-film/voiceover/shubh_t/
+diwali-film/voiceover/*.pcm
