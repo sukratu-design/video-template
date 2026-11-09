@@ -25,7 +25,22 @@
 - **Upload limit:** the full render is ~32 MB; chat upload limit was 30 MB. Deliver a `libx264 -crf 25 -c:a copy` copy (~13.5 MB).
 - **Known visual weak spots:** see `painted-film/STYLE.md`.
 
+## Second film: Diwali, "A Row of Lamps" (Nov 2026)
+`diwali-film/`, 69.5 s, 10 beats, built from `painted-film/` in one session. Beat table: `diwali-film/brief/SCRIPT.md`. What it taught us:
+- **Voice first, then beats.** Takes were measured, then beat boundaries `B[]`, caption cues, cut/bell times in `audio.js` were set from them (a few beats moved by up to ~1 s from the approved table). All lines fit at tempo 1.0.
+- **Sarvam key:** `sarvam.mjs` now reads `SARVAM_API_KEY` from the environment first, then `~/.sarvam.env`. Cloud sessions usually have the env var.
+- **Compositor tweak (diwali-film only):** `composite()` no longer applies the pigment-bleed blur or the per-pixel edge displacement to the artwork, because it smeared drawings and caption text. The paper and the grain mottling of wash density are unchanged. `painted-film/` still has the original compositor.
+- **Caption ghost line removed:** the faint pencil copy under each caption was dropped (reviewer found it confusing).
+- **Layout:** the painting is scaled .87 about (540,470); keep art y roughly 215-1000 and centre scenes between title/labels and the caption. A subtitle drawn above a wash must clear the wash top.
+- **Night scenes on paper:** the compositor is subtractive, so a dark wash would swallow lit flames. Cut glow holes in the wash with `destination-out` radial gradients (`cutGlow`), then draw silhouettes and lit windows on top.
+- **Canvas pitfalls:** `drawFlame` sets an absolute `globalAlpha`, and several helpers reset `ctx.globalAlpha=alpha`. Both ignore a parent fade, so faded diyas kept bright flames. Capture the incoming alpha (`const pa=ctx.globalAlpha`) and restore to it; pass `alpha:` to `groundWash` when fading a group. `ctx.lineWidth=0` is ignored by canvas, so never use `width:0` strokes.
+- **Hero element shared across beats** (`DX,DY,DS`) so the film loops; if you move it, move it everywhere.
+- **QA tool:** `diwali-film/stills.mjs <dir> <times...>` renders PNG stills forward-only (captions on), far quicker than a render. Full render took ~5 min on this environment.
+
 ## Open items
 - Redraw the hands (beats 1 and 13); recolour the bow; fix beat 4's opening zoom.
 - Make the voiceover pipeline a single script (currently JS generation + Python assembly).
 - Rotate any API key that was ever pasted into a chat.
+- Port the clean-edge compositor (and caption change) back to `painted-film/` if wanted.
+- Re-centre Diwali beats 2-10 vertically like beat 1 (a follow-up session was started).
+- Listen to the Diwali voiceover for pacing and Hindi-term pronunciation.
