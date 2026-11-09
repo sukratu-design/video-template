@@ -16,6 +16,7 @@ Read these before working:
 | `launch-film/` | 16:9 1920×1080 and 9:16 1080×1920 (Reels-safe), 30 fps, 30 s | Story: chaos → problem → stat → brand reveal → fix → proof → CTA |
 | `painted-film/` | 1:1 1080×1080, 30 fps, 68 s | Company School painted-watercolour explainer with Indian-English voiceover. Worked example: karma / "The Life of a Seed". Read `painted-film/STYLE.md`, `painted-film/README.md`, `docs/PAINTED-FILM-HISTORY.md` and the `painted-film` skill. |
 | `diwali-film/` | 1:1 1080×1080, 30 fps, 69.5 s | "A Row of Lamps": Diwali explainer built from `painted-film/` (new beats, score, Sarvam Shubh voiceover). See `diwali-film/README.md` and `brief/SCRIPT.md`. |
+| `dussehra-diwali-film/` | 1:1 1080×1080, 30 fps, 85.5 s (final) | "Dussehra to Diwali, the long way home": why Rama reached Ayodhya some time after the victory over Ravana. Ten generated Company School paintings (`frames/`, GPT Image 2.6) with camera moves over the Sarvam voiceover and a generated bansuri score, opening on a 1.5 s cover; the code-drawn version is `index-drawn.html`. See `dussehra-diwali-film/README.md`, `brief/SCRIPT.md` (accuracy notes) and `brief/IMAGE-PROMPTS.md`. |
 
 ## Hard rules
 1. **For a new film, edit `launch-film/content.js` only.** It holds copy, brand tokens, the wordmark path, the audio path, notifications, calendar cards and final slots. Touch `index.html` / `vertical.html` only if the story structure or timing changes. Make timing changes in **both** files, because they're parallel copies of the same timeline.

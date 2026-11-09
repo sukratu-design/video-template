@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dussehra to Diwali — The Long Way Home</title>
+<style>
+  @font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:500;font-display:block;src:url('./fonts/ibm-plex-mono-500.ttf') format('truetype')}
+  @font-face{font-family:'Tiro Devanagari Sanskrit';font-style:normal;font-weight:400;font-display:block;src:url('./fonts/tiro-devanagari-sanskrit-400.ttf') format('truetype')}
+  @font-face{font-family:'Pinyon Script';font-style:normal;font-weight:400;font-display:block;src:url('./fonts/pinyon-script-400.ttf') format('truetype')}
+  :root{color-scheme:dark;--ink:#e9e2d2;--panel:#17171c;--green:#3be38a}
+  *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#101014;color:var(--ink);font-family:"IBM Plex Mono",monospace}
+  body{display:flex;flex-direction:column;align-items:center;overflow-x:hidden}
+  #stage{width:min(100vw,100vh);height:min(100vw,100vh);display:grid;place-items:center;background:#0c0c18}
+  canvas{display:block;width:100%;height:100%;object-fit:contain;background:#f3e6cc}
+  #ui{width:min(1080px,100%);padding:12px 16px 22px;background:var(--panel);border-top:1px solid #323238}
+  #transport{display:grid;grid-template-columns:auto 1fr auto auto;gap:12px;align-items:center}
+  button{font:500 12px "IBM Plex Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);background:#25252c;border:1px solid #41414b;border-radius:3px;padding:8px 12px;cursor:pointer}
+  button:hover,button:focus-visible{border-color:var(--green);outline:none}
+  input[type=range]{width:100%;accent-color:var(--green)}#time{font-size:12px;color:#cbc8bf;min-width:92px;text-align:right}
+  #beats{display:flex;flex-wrap:wrap;gap:5px;margin-top:11px}#beats button{padding:5px 8px;font-size:10px;color:#aaa8a1}
+  #audioBtn{font-size:10px}#audioBtn:disabled{opacity:.5;cursor:wait}
+  body.render #ui{display:none}body.render{background:#0c0c18;overflow:hidden}body.render #stage{width:1080px;height:1080px}
+  @media(min-aspect-ratio:1/1){body:not(.render) #stage{height:calc(100vh - 122px);width:calc(100vh - 122px)}}
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="film" width="1080" height="1080" aria-label="Dussehra to Diwali, a painted film about Rama's return to Ayodhya"></canvas></div>
+<audio id="vo" src="vo.mp3" preload="auto"></audio>
+<div id="ui">
+  <div id="transport"><button id="play" type="button">Play</button><input id="scrub" type="range" min="0" max="85.5" step="0.0333333333" value="0" aria-label="Timeline"><span id="time">00:00.00</span><button id="audioBtn" type="button">Download audio</button></div>
+  <div id="beats"></div>
+</div>
+<script src="audio.js"></script>
+<script>
+'use strict';
+/* Image-based version: ten Company School paintings (generated with GPT Image 2.6 from the style reference,
+   see brief/IMAGE-PROMPTS.md), each with a slow camera move, dissolves between beats, and handwritten
+   captions set from the measured voiceover. The earlier code-drawn version is kept in index-drawn.html. */
+const W=1080,H=1080;
+const INK='#2A1C14',UMBER='#6A4426',PENCIL='#8A847C';
+const SCRIPT='"Pinyon Script", cursive',DEVA='"Tiro Devanagari Sanskrit", serif';
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const ease=t=>{t=clamp(t);return t*t*(3-2*t)};
+const B=[0,6.4,17.4,27.2,32.7,40.4,46.9,55.3,62.0,68.0,84.0]; // beat boundaries, set from the measured voiceover
+const FILM=84.0,LEAD=1.5; // the cover (frames/cover.jpg) holds for LEAD s before the film; render.mjs delays the audio by window.LEAD
+window.LEAD=LEAD;window.duration=FILM+LEAD;
+const XF=.7; // dissolve length (s), centred on each boundary
+/* Camera per beat, in image-normalised coordinates: zoom (1 = the square image exactly fills the frame)
+   and focus point, from (z0,x0,y0) to (z1,x1,y1) over the beat with an ease-in-out. */
+const CAM=[
+  {z0:1.00,x0:.50,y0:.50, z1:1.09,x1:.58,y1:.47}, // 1 victory: push toward Ravana
+  {z0:1.07,x0:.50,y0:.42, z1:1.00,x1:.50,y1:.50}, // 2 calendar: settle out from the moons
+  {z0:1.00,x0:.50,y0:.52, z1:1.10,x1:.52,y1:.58}, // 3 last rites: toward the pyre
+  {z0:1.10,x0:.55,y0:.42, z1:1.00,x1:.50,y1:.50}, // 4 coronation: pull back from the abhisheka
+  {z0:1.00,x0:.50,y0:.50, z1:1.10,x1:.60,y1:.50}, // 5 fire ordeal: toward Sita
+  {z0:1.10,x0:.40,y0:.58, z1:1.04,x1:.52,y1:.44}, // 6 Pushpaka: rise with the chariot
+  {z0:1.55,x0:.56,y0:.80, z1:1.12,x1:.50,y1:.36}, // 7 map: from Lanka up the route to Ayodhya
+  {z0:1.14,x0:.36,y0:.48, z1:1.14,x1:.64,y1:.50}, // 8 Hanuman: pan with the leap
+  {z0:1.08,x0:.55,y0:.62, z1:1.00,x1:.50,y1:.50}, // 9 reunion: pull back from the sandals
+  {z0:1.07,x0:.55,y0:.55, z1:1.00,x1:.50,y1:.50}  // 10 Diwali: settle on the city
+];
+const IMGS=[];
+function camAt(i,t){const c=CAM[i],u=ease((t-B[i])/(B[i+1]-B[i]));return{z:lerp(c.z0,c.z1,u),x:lerp(c.x0,c.x1,u),y:lerp(c.y0,c.y1,u)}}
+function drawPainting(ctx,i,t,alpha){const img=IMGS[i];if(!img||alpha<=0)return;const c=camAt(i,clamp(t,B[i],B[i+1]));const s=W*c.z;let ox=W/2-c.x*s,oy=H/2-c.y*s;ox=Math.min(0,Math.max(W-s,ox));oy=Math.min(0,Math.max(H-s,oy));ctx.save();ctx.globalAlpha=alpha;ctx.imageSmoothingQuality='high';ctx.drawImage(img,ox,oy,s,s);ctx.restore()}
+/* Captions: handwritten copperplate in ink, written on left to right, on a soft paper-coloured ground so they
+   stay legible where a painting reaches the bottom of the sheet. */
+const captionCues=[
+  [0.5, 3.72, "Dussehra celebrates Rama's victory over Ravana."],
+  [3.72, 6.27, "Diwali celebrates his homecoming."],
+  [6.6, 9.93, "In the calendar, they sit about twenty days apart."],
+  [9.93, 12.39, "That count is later tradition."],
+  [12.39, 15.02, "The Ramayana does not count the days."],
+  [15.02, 17.23, "It gives an order of duties."],
+  [17.6, 21.8, "First, Rama asked Vibhishana, Ravana's brother,"],
+  [21.8, 23.62, "to perform the last rites."],
+  [23.62, 27.04, "Enmity, he said, ends with death."],
+  [27.4, 30.61, "Then Vibhishana was crowned king of Lanka,"],
+  [30.61, 32.46, "as Rama had promised."],
+  [32.9, 36.37, "Sita passed through fire, the Agni Pariksha."],
+  [36.37, 40.18, "Agni, the fire itself, returned her unharmed."],
+  [40.6, 43.74, "Vibhishana gave them the Pushpaka Vimana,"],
+  [43.74, 46.95, "a flying chariot, and they turned north."],
+  [47.0, 50.29, "Over the bridge they had built, past Kishkindha,"],
+  [50.29, 55.45, "to Sage Bharadwaja's ashram, where the Ganga and Yamuna meet."],
+  [55.5, 57.86, "Hanuman raced ahead to tell Bharata,"],
+  [57.86, 62.0, "who for fourteen years had kept Rama's sandals on the throne."],
+  [62.2, 64.11, "The fourteen years were over."],
+  [64.11, 67.75, "The sandals were returned, and Rama came home."],
+  [68.2, 72.39, "Tradition says Ayodhya lit lamps to welcome him."],
+  [72.39, 75.81, "Victory first, then duty, then home."],
+  [76.3, 80.68, "That is why there is a gap between Dussehra and Diwali."]
+];
+function wrapText(ctx,text,max){if(ctx.measureText(text).width>max){const w=text.split(' ');let best=null;for(let k=1;k<w.length;k++){const a=w.slice(0,k).join(' '),b=w.slice(k).join(' '),m=Math.max(ctx.measureText(a).width,ctx.measureText(b).width);if(m<=max&&(!best||m<best.m))best={m,l:[a,b]}}if(best)return best.l}const words=text.split(' '),lines=[];let line='';for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>max&&line){lines.push(line);line=word}else line=test}if(line)lines.push(line);return lines}
+function captionGround(ctx,a){if(a<=0)return;const g=ctx.createLinearGradient(0,850,0,1080);g.addColorStop(0,'rgba(238,226,202,0)');g.addColorStop(.35,`rgba(238,226,202,${.82*a})`);g.addColorStop(1,`rgba(238,226,202,${.9*a})`);ctx.save();ctx.fillStyle=g;ctx.fillRect(0,850,W,230);ctx.restore()}
+function drawCaption(ctx,t){const cue=captionCues.find(l=>t>=l[0]&&t<l[1]);if(!cue)return;const text=cue[2];ctx.save();ctx.textBaseline='alphabetic';ctx.textAlign='left';let size=54;ctx.font=`${size}px ${SCRIPT}`;let lines=wrapText(ctx,text,930);if(lines.length>2){size=46;ctx.font=`${size}px ${SCRIPT}`;lines=wrapText(ctx,text,960)}const lh=size*.98,base=lines.length>1?958:996,widths=lines.map(l=>ctx.measureText(l).width),total=widths.reduce((a,b)=>a+b,0),reveal=clamp((t-cue[0])/Math.min(.6,(cue[1]-cue[0])*.4));let acc=0;lines.forEach((l,i)=>{const w=widths[i],x=540-w/2,y=base+i*lh,q=clamp((reveal*total-acc)/w);acc+=w;if(q<=0)return;ctx.save();ctx.beginPath();ctx.rect(x-30,y-size*1.2,(w+60)*q,size*1.8);ctx.clip();ctx.fillStyle=INK;ctx.fillText(l,x,y);ctx.restore()});ctx.restore()}
+function text(ctx,str,x,y,{size=44,font=SCRIPT,color=INK,alpha=1,align='center'}={}){if(alpha<=0)return;ctx.save();ctx.globalAlpha=alpha;ctx.textAlign=align;ctx.textBaseline='alphabetic';ctx.fillStyle=color;ctx.font=`${size}px ${font}`;ctx.fillText(str,x,y);ctx.restore()}
+const canvas=document.getElementById('film'),ctx=canvas.getContext('2d',{alpha:false});
+const query=new URLSearchParams(location.search),renderMode=query.get('render')==='1',captions=renderMode||query.get('captions')!=='0';
+if(renderMode)document.body.classList.add('render');
+const scenes=B.slice(0,-1).map((s,i)=>({id:'b'+(i+1),start:s,end:B[i+1]}));
+window.scenes=scenes;
+function renderFilm(t){
+  t=clamp(t,0,FILM);window.__t=t;
+  ctx.fillStyle='#EDE3CE';ctx.fillRect(0,0,W,H);
+  let i=scenes.findIndex(s=>t>=s.start&&t<s.end);if(i<0)i=scenes.length-1;
+  if(i>0&&t<B[i]+XF/2){drawPainting(ctx,i-1,t,1);drawPainting(ctx,i,t,ease((t-(B[i]-XF/2))/XF))}
+  else if(i<scenes.length-1&&t>B[i+1]-XF/2){drawPainting(ctx,i,t,1);drawPainting(ctx,i+1,t,ease((t-(B[i+1]-XF/2))/XF))}
+  else drawPainting(ctx,i,t,1);
+  // fade in from paper at the start, and the closing greeting
+  if(t<.8){ctx.save();ctx.globalAlpha=1-ease(t/.8);ctx.fillStyle='#EDE3CE';ctx.fillRect(0,0,W,H);ctx.restore()}
+  const title=Math.min(ease((t-.15)/.8),1-ease((t-5.2)/.9));if(title>0){const g=ctx.createLinearGradient(0,0,0,250);g.addColorStop(0,`rgba(238,226,202,${.85*title})`);g.addColorStop(1,'rgba(238,226,202,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,250);text(ctx,'Dussehra to Diwali',540,118,{size:96,alpha:title});text(ctx,'the long way home',540,170,{size:42,color:UMBER,alpha:title})}
+  const sig=ease((t-80.9)/1.2);if(sig>0){const g=ctx.createLinearGradient(0,0,0,230);g.addColorStop(0,`rgba(238,226,202,${.85*sig})`);g.addColorStop(1,'rgba(238,226,202,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,230);text(ctx,'शुभ दीपावली',540,128,{size:80,font:DEVA,alpha:sig});text(ctx,'Sukratu Labs',1040,1052,{size:28,color:PENCIL,alpha:sig*.9,align:'right'})}
+  if(captions){const cue=captionCues.find(l=>t>=l[0]-.3&&t<l[1]+.3);captionGround(ctx,cue?clamp(Math.min(t-(cue[0]-.3),cue[1]+.3-t)/.3):0);drawCaption(ctx,t)}
+}
+const COVER=new Image();
+/* Frame time t includes the cover lead: the cover holds, then dissolves to paper as the film fades in. */
+window.renderFrame=function(t){
+  t=clamp(t,0,window.duration);
+  renderFilm(Math.max(0,t-LEAD));
+  if(t<LEAD){const a=1-ease((t-(LEAD-.5))/.5);ctx.save();ctx.globalAlpha=a;ctx.drawImage(COVER,0,0,W,H);ctx.restore()}
+};
+/* APP */
+async function loadImages(){await new Promise((res,rej)=>{COVER.onload=()=>res();COVER.onerror=()=>rej(new Error('missing frames/cover.jpg'));COVER.src='frames/cover.jpg'});await Promise.all(Array.from({length:10},(_,i)=>new Promise((res,rej)=>{const im=new Image();im.onload=()=>{IMGS[i]=im;im.decode?im.decode().then(res,res):res()};im.onerror=()=>rej(new Error('missing frames/b'+String(i+1).padStart(2,'0')+'.jpg'));im.src='frames/b'+String(i+1).padStart(2,'0')+'.jpg'})))}
+async function init(){
+  await Promise.all([document.fonts.load('42px "Tiro Devanagari Sanskrit"'),document.fonts.load('42px "Pinyon Script"'),document.fonts.load('500 12px "IBM Plex Mono"'),loadImages()]);
+  await document.fonts.ready;
+  if(!renderMode){
+    const playBtn=document.getElementById('play'),scrub=document.getElementById('scrub'),time=document.getElementById('time'),beats=document.getElementById('beats'),audioBtn=document.getElementById('audioBtn');
+    let playing=false,clock0=0,t0=0,cur=0;
+    const fmt=t=>{const m=Math.floor(t/60),s=t%60;return String(m).padStart(2,'0')+':'+s.toFixed(2).padStart(5,'0')};
+    const upd=t=>{cur=t;scrub.value=t;time.textContent=fmt(t)};
+    const vo=document.getElementById('vo');let voOk=false;vo.addEventListener('canplaythrough',()=>{voOk=true},{once:true});
+    function tick(){if(!playing)return;let t=t0+(performance.now()-clock0)/1000;if(voOk&&t>=LEAD&&vo.paused&&t<window.duration-.1){vo.currentTime=t-LEAD;vo.play().catch(()=>{})}if(t>=window.duration){t=0;t0=0;clock0=performance.now();if(voOk){vo.currentTime=0;vo.play().catch(()=>{})}}renderFrame(t);upd(t);requestAnimationFrame(tick)}
+    function setPlaying(on){playing=on;playBtn.textContent=on?'Pause':'Play';if(on){t0=cur>=window.duration-.05?0:cur;clock0=performance.now();if(voOk&&t0>=LEAD){vo.currentTime=t0-LEAD;vo.play().catch(()=>{})}requestAnimationFrame(tick)}else vo.pause()}
+    playBtn.addEventListener('click',()=>setPlaying(!playing));
+    scrub.addEventListener('input',e=>{const t=+e.target.value;if(playing)setPlaying(false);renderFrame(t);upd(t)});
+    scenes.forEach(sc=>{const b=document.createElement('button');b.textContent=sc.id;b.addEventListener('click',()=>{if(playing)setPlaying(false);renderFrame(sc.start+.4);upd(sc.start+.4)});beats.appendChild(b)});
+    audioBtn.addEventListener('click',async()=>{audioBtn.disabled=true;try{const wav=await window.KarmaAudio.renderWav();const a=document.createElement('a');a.href=URL.createObjectURL(wav);a.download='audio.wav';a.click()}finally{audioBtn.disabled=false}});
+    renderFrame(0);upd(0);
+  } else renderFrame(0);
+}
+window.ready=init().then(()=>true);
+</script>
+</body>
+</html>
