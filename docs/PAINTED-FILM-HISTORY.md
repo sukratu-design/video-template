@@ -37,6 +37,13 @@
 - **Hero element shared across beats** (`DX,DY,DS`) so the film loops; if you move it, move it everywhere.
 - **QA tool:** `diwali-film/stills.mjs <dir> <times...>` renders PNG stills forward-only (captions on), far quicker than a render. Full render took ~5 min on this environment.
 
+## Third film: Dussehra to Diwali, "the long way home" (Nov 2026)
+`dussehra-diwali-film/`, 77.5 s, 10 beats, built from `diwali-film/` in one session from a user-supplied Grok draft. Beat table and accuracy notes: `dussehra-diwali-film/brief/SCRIPT.md`. What it taught us:
+- **Check AI-drafted scripts against the source.** The draft implied the epic explains the ~20-day festival gap; it does not. The film separates the calendar (later tradition) from the epic (an order of duties), and says "tradition says" for the lamps.
+- **Estimate length from words, then expect it to grow.** The approved table assumed ~70 s; Sarvam takes for 155 words measured ~69 s of speech alone, so with 0.6 s breaths the film became 77.5 s. Keeping tempo 1.0 was preferred over squeezing.
+- **Symbols, not figures:** bow and arrow, a ten-spired crown, a pyre, crown + chhatra + kalash (abhisheka), a lotus through fire, a winged chariot, a mace with a saffron streak, sandals on a throne, footprints. Watch for accidental faces: two oval sandals under an open arch read as eyes, so the throne back became a solid cusped panel and the sandals were splayed.
+- **Alpha-respecting toolkit:** `hatch`, `groundWash`, `drawShrub`, `drawFlame`, `label2`, `footprint`, `ribbon`, `stars`, `nightWash` now multiply by the incoming `globalAlpha` in this film (fixes the pitfall noted above at the source). `diya()` no longer passes `ctx.globalAlpha` to `drawFlame`.
+
 ## Open items
 - Redraw the hands (beats 1 and 13); recolour the bow; fix beat 4's opening zoom.
 - Make the voiceover pipeline a single script (currently JS generation + Python assembly).
@@ -44,3 +51,4 @@
 - Port the clean-edge compositor (and caption change) back to `painted-film/` if wanted.
 - Re-centre Diwali beats 2-10 vertically like beat 1 (a follow-up session was started).
 - Listen to the Diwali voiceover for pacing and Hindi-term pronunciation.
+- Dussehra-to-Diwali film: user review of the compressed render (pacing, the 77.5 s length, Indic-term pronunciation); port the alpha-respecting helpers back to `diwali-film/` and `painted-film/` if wanted.
