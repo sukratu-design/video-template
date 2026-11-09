@@ -22,7 +22,7 @@ function run(cmd, args) {
   });
 }
 
-const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'] });
+const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--allow-file-access-from-files'] });
 try {
   const page = await browser.newPage();
   page.on('pageerror', e => console.error('page error:', e.message));

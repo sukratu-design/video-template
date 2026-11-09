@@ -25,7 +25,7 @@ async function renderWav(){
   // bell shimmer on sparks
   function bell(t,freq=.8){const o=ctx.createOscillator();o.type='sine';o.frequency.value=freq*1000;const g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.18,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+2.4);o.connect(g);g.connect(master);o.start(t);o.stop(t+2.5);const o2=ctx.createOscillator();o2.type='triangle';o2.frequency.value=freq*1500;o2.connect(g);o2.start(t);o2.stop(t+2.5)}
   // bells on story events (absolute seconds, from the beat timelines in index.html)
-  for(const [t,f] of [[2.62,.6],[7.4,.8],[14.9,.9],[15.3,.9],[15.7,.9],[16.1,.9],[21.6,.6],[30.7,.95],[36.5,.85],[42.7,.8],[49.7,.75],[52.5,.75],[57.5,.7],[62.6,.6],[66.2,.9],[69.2,.8],[70.0,.85],[70.8,.9],[71.6,.95],[72.4,1.0],[74.9,.8]])bell(t,f);
+  for(const [t,f] of [[2.62,.6],[30.7,.95],[36.5,.85],[42.7,.8],[49.7,.75],[52.5,.75],[57.5,.7],[62.6,.6],[66.2,.9],[69.2,.8],[70.0,.85],[70.8,.9],[71.6,.95],[72.4,1.0],[74.9,.8]])bell(t,f);
   // soft air whooshes: the arrow, the vimana's lift, Hanuman's run
   function whoosh(t,d,f0,f1){const n=ctx.createBufferSource(),b=ctx.createBuffer(1,Math.floor(SR*d),SR),dd=b.getChannelData(0),r=mulberry32(hash('w'+t));for(let i=0;i<dd.length;i++)dd[i]=r()*2-1;n.buffer=b;const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.Q.value=1.2;bp.frequency.setValueAtTime(f0,t);bp.frequency.exponentialRampToValueAtTime(f1,t+d);const g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.16,t+d*.6);g.gain.linearRampToValueAtTime(0,t+d);n.connect(bp);bp.connect(g);g.connect(master);n.start(t)}
   whoosh(2.05,.7,500,2400);whoosh(42.6,2.2,300,1200);whoosh(55.4,2.0,400,2000);
