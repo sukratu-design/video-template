@@ -4,6 +4,8 @@ A 77.5 s, 1080×1080 painted explainer on why Rama reached Ayodhya (Diwali) only
 
 **Two versions:**
 - `index.html` (current): ten generated Company School paintings in `frames/` (GPT Image 2.6 via Higgsfield, style reference attached), each with a slow camera move (`CAM[]`), 0.7 s dissolves, and handwritten captions from the measured voiceover. Prompts, model comparison and lessons: `brief/IMAGE-PROMPTS.md`.
+- **Cover lead:** the video opens on `frames/cover.jpg` (made with `cover.mjs` from frame 10) for 1.5 s (`LEAD`), then dissolves into the film, so the upload can use frame 0 as its thumbnail. `render.mjs` delays the voiceover and music by `window.LEAD`. Total length 85.5 s.
+- **Music:** `music.mp3` (gitignored) is the bansuri-led Raga Yaman score generated with ElevenLabs Music v2.5 on Higgsfield; `render.mjs` uses it when present, else the synthesized `audio.js` score.
 - `index-drawn.html`: the earlier fully code-drawn version (symbols only, built from `../diwali-film/`'s toolkit and compositor; beats 1 and 4 have the detailed scenery pass). `render.mjs`/`stills.mjs` render `index.html`; to render the drawn version, rename it.
 
 ## Run

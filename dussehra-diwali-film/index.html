@@ -28,7 +28,7 @@
 <div id="stage"><canvas id="film" width="1080" height="1080" aria-label="Dussehra to Diwali, a painted film about Rama's return to Ayodhya"></canvas></div>
 <audio id="vo" src="vo.mp3" preload="auto"></audio>
 <div id="ui">
-  <div id="transport"><button id="play" type="button">Play</button><input id="scrub" type="range" min="0" max="84" step="0.0333333333" value="0" aria-label="Timeline"><span id="time">00:00.00</span><button id="audioBtn" type="button">Download audio</button></div>
+  <div id="transport"><button id="play" type="button">Play</button><input id="scrub" type="range" min="0" max="85.5" step="0.0333333333" value="0" aria-label="Timeline"><span id="time">00:00.00</span><button id="audioBtn" type="button">Download audio</button></div>
   <div id="beats"></div>
 </div>
 <script src="audio.js"></script>
@@ -44,7 +44,8 @@ const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
 const lerp=(a,b,t)=>a+(b-a)*t;
 const ease=t=>{t=clamp(t);return t*t*(3-2*t)};
 const B=[0,6.4,17.4,27.2,32.7,40.4,46.9,55.3,62.0,68.0,84.0]; // beat boundaries, set from the measured voiceover
-window.duration=84.0;
+const FILM=84.0,LEAD=1.5; // the cover (frames/cover.jpg) holds for LEAD s before the film; render.mjs delays the audio by window.LEAD
+window.LEAD=LEAD;window.duration=FILM+LEAD;
 const XF=.7; // dissolve length (s), centred on each boundary
 /* Camera per beat, in image-normalised coordinates: zoom (1 = the square image exactly fills the frame)
    and focus point, from (z0,x0,y0) to (z1,x1,y1) over the beat with an ease-in-out. */
@@ -100,8 +101,8 @@ const query=new URLSearchParams(location.search),renderMode=query.get('render')=
 if(renderMode)document.body.classList.add('render');
 const scenes=B.slice(0,-1).map((s,i)=>({id:'b'+(i+1),start:s,end:B[i+1]}));
 window.scenes=scenes;
-window.renderFrame=function(t){
-  t=clamp(t,0,window.duration);window.__t=t;
+function renderFilm(t){
+  t=clamp(t,0,FILM);window.__t=t;
   ctx.fillStyle='#EDE3CE';ctx.fillRect(0,0,W,H);
   let i=scenes.findIndex(s=>t>=s.start&&t<s.end);if(i<0)i=scenes.length-1;
   if(i>0&&t<B[i]+XF/2){drawPainting(ctx,i-1,t,1);drawPainting(ctx,i,t,ease((t-(B[i]-XF/2))/XF))}
@@ -109,12 +110,19 @@ window.renderFrame=function(t){
   else drawPainting(ctx,i,t,1);
   // fade in from paper at the start, and the closing greeting
   if(t<.8){ctx.save();ctx.globalAlpha=1-ease(t/.8);ctx.fillStyle='#EDE3CE';ctx.fillRect(0,0,W,H);ctx.restore()}
-  const title=1-ease((t-5.2)/.9);if(title>0){const g=ctx.createLinearGradient(0,0,0,250);g.addColorStop(0,`rgba(238,226,202,${.85*title})`);g.addColorStop(1,'rgba(238,226,202,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,250);text(ctx,'Dussehra to Diwali',540,118,{size:96,alpha:title});text(ctx,'the long way home',540,170,{size:42,color:UMBER,alpha:title})}
+  const title=Math.min(ease((t-.15)/.8),1-ease((t-5.2)/.9));if(title>0){const g=ctx.createLinearGradient(0,0,0,250);g.addColorStop(0,`rgba(238,226,202,${.85*title})`);g.addColorStop(1,'rgba(238,226,202,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,250);text(ctx,'Dussehra to Diwali',540,118,{size:96,alpha:title});text(ctx,'the long way home',540,170,{size:42,color:UMBER,alpha:title})}
   const sig=ease((t-80.9)/1.2);if(sig>0){const g=ctx.createLinearGradient(0,0,0,230);g.addColorStop(0,`rgba(238,226,202,${.85*sig})`);g.addColorStop(1,'rgba(238,226,202,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,230);text(ctx,'शुभ दीपावली',540,128,{size:80,font:DEVA,alpha:sig});text(ctx,'Sukratu Labs',1040,1052,{size:28,color:PENCIL,alpha:sig*.9,align:'right'})}
   if(captions){const cue=captionCues.find(l=>t>=l[0]-.3&&t<l[1]+.3);captionGround(ctx,cue?clamp(Math.min(t-(cue[0]-.3),cue[1]+.3-t)/.3):0);drawCaption(ctx,t)}
+}
+const COVER=new Image();
+/* Frame time t includes the cover lead: the cover holds, then dissolves to paper as the film fades in. */
+window.renderFrame=function(t){
+  t=clamp(t,0,window.duration);
+  renderFilm(Math.max(0,t-LEAD));
+  if(t<LEAD){const a=1-ease((t-(LEAD-.5))/.5);ctx.save();ctx.globalAlpha=a;ctx.drawImage(COVER,0,0,W,H);ctx.restore()}
 };
 /* APP */
-async function loadImages(){await Promise.all(Array.from({length:10},(_,i)=>new Promise((res,rej)=>{const im=new Image();im.onload=()=>{IMGS[i]=im;im.decode?im.decode().then(res,res):res()};im.onerror=()=>rej(new Error('missing frames/b'+String(i+1).padStart(2,'0')+'.jpg'));im.src='frames/b'+String(i+1).padStart(2,'0')+'.jpg'})))}
+async function loadImages(){await new Promise((res,rej)=>{COVER.onload=()=>res();COVER.onerror=()=>rej(new Error('missing frames/cover.jpg'));COVER.src='frames/cover.jpg'});await Promise.all(Array.from({length:10},(_,i)=>new Promise((res,rej)=>{const im=new Image();im.onload=()=>{IMGS[i]=im;im.decode?im.decode().then(res,res):res()};im.onerror=()=>rej(new Error('missing frames/b'+String(i+1).padStart(2,'0')+'.jpg'));im.src='frames/b'+String(i+1).padStart(2,'0')+'.jpg'})))}
 async function init(){
   await Promise.all([document.fonts.load('42px "Tiro Devanagari Sanskrit"'),document.fonts.load('42px "Pinyon Script"'),document.fonts.load('500 12px "IBM Plex Mono"'),loadImages()]);
   await document.fonts.ready;
@@ -124,8 +132,8 @@ async function init(){
     const fmt=t=>{const m=Math.floor(t/60),s=t%60;return String(m).padStart(2,'0')+':'+s.toFixed(2).padStart(5,'0')};
     const upd=t=>{cur=t;scrub.value=t;time.textContent=fmt(t)};
     const vo=document.getElementById('vo');let voOk=false;vo.addEventListener('canplaythrough',()=>{voOk=true},{once:true});
-    function tick(){if(!playing)return;let t=voOk&&!vo.paused?vo.currentTime:t0+(performance.now()-clock0)/1000;if(t>=window.duration){t=0;t0=0;clock0=performance.now();if(voOk){vo.currentTime=0;vo.play().catch(()=>{})}}renderFrame(t);upd(t);requestAnimationFrame(tick)}
-    function setPlaying(on){playing=on;playBtn.textContent=on?'Pause':'Play';if(on){t0=cur>=window.duration-.05?0:cur;clock0=performance.now();if(voOk){vo.currentTime=t0;vo.play().catch(()=>{})}requestAnimationFrame(tick)}else vo.pause()}
+    function tick(){if(!playing)return;let t=t0+(performance.now()-clock0)/1000;if(voOk&&t>=LEAD&&vo.paused&&t<window.duration-.1){vo.currentTime=t-LEAD;vo.play().catch(()=>{})}if(t>=window.duration){t=0;t0=0;clock0=performance.now();if(voOk){vo.currentTime=0;vo.play().catch(()=>{})}}renderFrame(t);upd(t);requestAnimationFrame(tick)}
+    function setPlaying(on){playing=on;playBtn.textContent=on?'Pause':'Play';if(on){t0=cur>=window.duration-.05?0:cur;clock0=performance.now();if(voOk&&t0>=LEAD){vo.currentTime=t0-LEAD;vo.play().catch(()=>{})}requestAnimationFrame(tick)}else vo.pause()}
     playBtn.addEventListener('click',()=>setPlaying(!playing));
     scrub.addEventListener('input',e=>{const t=+e.target.value;if(playing)setPlaying(false);renderFrame(t);upd(t)});
     scenes.forEach(sc=>{const b=document.createElement('button');b.textContent=sc.id;b.addEventListener('click',()=>{if(playing)setPlaying(false);renderFrame(sc.start+.4);upd(sc.start+.4)});beats.appendChild(b)});

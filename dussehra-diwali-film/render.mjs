@@ -67,13 +67,14 @@ try {
   // Mux: music ducks under the voiceover (sidechain), then one loudness pass to -16 LUFS / -1.5 dBTP.
   const len = (frames / FPS).toFixed(3);
   const musicIn = existsSync(musicPath) ? musicPath : audioPath;
+  const leadMs = Math.round(1000 * (await page.evaluate(() => window.LEAD || 0))); // cover hold before the film
   console.log('music:', path.basename(musicIn));
   const inputs = ['-i', silentVideo, '-i', musicIn];
   let filter;
   if (existsSync(voPath)) {
     inputs.push('-i', voPath);
-    filter = '[2:a]aresample=48000,aformat=channel_layouts=stereo,asplit=2[vo][key];' +
-      '[1:a]aresample=48000,aformat=channel_layouts=stereo,volume=0.42[mus];' +
+    filter = `[2:a]adelay=${leadMs}|${leadMs},aresample=48000,` + 'aformat=channel_layouts=stereo,asplit=2[vo][key];' +
+      `[1:a]adelay=${leadMs}|${leadMs},aresample=48000,aformat=channel_layouts=stereo,volume=0.42[mus];` +
       '[mus][key]sidechaincompress=threshold=0.02:ratio=5:attack=30:release=450[duck];' +
       '[duck][vo]amix=inputs=2:duration=longest:normalize=0,' +
       `apad,atrim=0:${len},loudnorm=I=-16:TP=-1.5:LRA=11,aresample=48000[a]`;
