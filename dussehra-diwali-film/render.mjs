@@ -12,6 +12,7 @@ const out = path.resolve(process.argv[2] || path.join(dir, 'karma-companyschool.
 const silentVideo = path.join(dir, 'video.mp4');
 const audioPath = path.join(dir, 'audio.wav');
 const voPath = path.join(dir, 'vo.mp3');
+const musicPath = path.join(dir, 'music.mp3'); // optional generated score; used instead of the synthesized audio.wav when present
 const FPS = 30;
 
 function run(cmd, args) {
@@ -65,7 +66,9 @@ try {
 
   // Mux: music ducks under the voiceover (sidechain), then one loudness pass to -16 LUFS / -1.5 dBTP.
   const len = (frames / FPS).toFixed(3);
-  const inputs = ['-i', silentVideo, '-i', audioPath];
+  const musicIn = existsSync(musicPath) ? musicPath : audioPath;
+  console.log('music:', path.basename(musicIn));
+  const inputs = ['-i', silentVideo, '-i', musicIn];
   let filter;
   if (existsSync(voPath)) {
     inputs.push('-i', voPath);
