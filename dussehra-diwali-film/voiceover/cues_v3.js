@@ -21,5 +21,6 @@ const captionCues=[
   [62.2, 64.11, "The fourteen years were over."],
   [64.11, 67.75, "The sandals were returned, and Rama came home."],
   [68.2, 72.39, "Tradition says Ayodhya lit lamps to welcome him."],
-  [72.39, 75.81, "Victory first, then duty, then home."]
+  [72.39, 75.81, "Victory first, then duty, then home."],
+  [76.3, 80.68, "That is why there is a gap between Dussehra and Diwali."]
 ];

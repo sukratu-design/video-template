@@ -12,7 +12,8 @@ const L=[
  "Over the bridge they had built, past किष्किंधा, to Sage भारद्वाज's ashram, where the rivers meet.",
  "हनुमान raced ahead to tell भरत, who for fourteen years had kept राम's sandals on the throne.",
  "The fourteen years were over. The sandals were returned, and राम came home.",
- "Tradition says अयोध्या lit lamps to welcome him. Victory first, then duty, then home."];
+ "Tradition says अयोध्या lit lamps to welcome him. Victory first, then duty, then home.",
+ "That is why there is a gap between दशहरा and दिवाली."];
 const paces=JSON.parse(process.argv[2]||'[]');const T=3;
 const only=process.argv[3]?process.argv[3].split(',').map(Number):L.map((_,i)=>i);
 await Promise.all(only.map(async i=>{

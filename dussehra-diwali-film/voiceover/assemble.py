@@ -1,9 +1,9 @@
 import sys,re,json,subprocess; sys.path.insert(0,'.')
 from measure import *
-DUR=77.5
-TAKE=[0,0,0,2,1,1,0,1,1,1]
-ST=[0.5,6.6,17.6,27.4,32.9,40.6,47.3,55.3,62.2,68.2]
-W=[ST[i+1]-ST[i]-0.1 for i in range(9)]+[DUR-ST[9]-0.3]
+DUR=84.0
+TAKE=[0,0,0,2,1,1,0,1,1,1,0]
+ST=[0.5,6.6,17.6,27.4,32.9,40.6,47.3,55.3,62.2,68.2,76.3]
+W=[ST[i+1]-ST[i]-0.1 for i in range(len(ST)-1)]+[DUR-ST[-1]-0.3]
 PIECES=[["Dussehra celebrates Rama's victory over Ravana.","Diwali celebrates his homecoming."],
 ["In the calendar, they sit about twenty days apart.","That count is later tradition.","The Ramayana does not count the days.","It gives an order of duties."],
 ["First, Rama asked Vibhishana, Ravana's brother,","to perform the last rites.","Enmity, he said, ends with death."],
@@ -13,7 +13,8 @@ PIECES=[["Dussehra celebrates Rama's victory over Ravana.","Diwali celebrates hi
 ["Over the bridge they had built, past Kishkindha,","to Sage Bharadwaja's ashram, where the rivers meet."],
 ["Hanuman raced ahead to tell Bharata,","who for fourteen years had kept Rama's sandals on the throne."],
 ["The fourteen years were over.","The sandals were returned, and Rama came home."],
-["Tradition says Ayodhya lit lamps to welcome him.","Victory first, then duty, then home."]]
+["Tradition says Ayodhya lit lamps to welcome him.","Victory first, then duty, then home."],
+["That is why there is a gap between Dussehra and Diwali."]]
 N=len(PIECES)
 def atempo(x,t):
     if t<=1.0005: return x

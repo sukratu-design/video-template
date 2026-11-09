@@ -28,7 +28,7 @@
 <div id="stage"><canvas id="film" width="1080" height="1080" aria-label="Dussehra to Diwali, a painted film about Rama's return to Ayodhya"></canvas></div>
 <audio id="vo" src="vo.mp3" preload="auto"></audio>
 <div id="ui">
-  <div id="transport"><button id="play" type="button">Play</button><input id="scrub" type="range" min="0" max="77.5" step="0.0333333333" value="0" aria-label="Timeline"><span id="time">00:00.00</span><button id="audioBtn" type="button">Download audio</button></div>
+  <div id="transport"><button id="play" type="button">Play</button><input id="scrub" type="range" min="0" max="84" step="0.0333333333" value="0" aria-label="Timeline"><span id="time">00:00.00</span><button id="audioBtn" type="button">Download audio</button></div>
   <div id="beats"></div>
 </div>
 <script src="audio.js"></script>
@@ -43,8 +43,8 @@ const SCRIPT='"Pinyon Script", cursive',DEVA='"Tiro Devanagari Sanskrit", serif'
 const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
 const lerp=(a,b,t)=>a+(b-a)*t;
 const ease=t=>{t=clamp(t);return t*t*(3-2*t)};
-const B=[0,6.4,17.4,27.2,32.7,40.4,47.1,55.1,62.0,68.0,77.5]; // beat boundaries, set from the measured voiceover
-window.duration=77.5;
+const B=[0,6.4,17.4,27.2,32.7,40.4,47.1,55.1,62.0,68.0,84.0]; // beat boundaries, set from the measured voiceover
+window.duration=84.0;
 const XF=.7; // dissolve length (s), centred on each boundary
 /* Camera per beat, in image-normalised coordinates: zoom (1 = the square image exactly fills the frame)
    and focus point, from (z0,x0,y0) to (z1,x1,y1) over the beat with an ease-in-out. */
@@ -88,7 +88,8 @@ const captionCues=[
   [62.2, 64.11, "The fourteen years were over."],
   [64.11, 67.75, "The sandals were returned, and Rama came home."],
   [68.2, 72.39, "Tradition says Ayodhya lit lamps to welcome him."],
-  [72.39, 75.81, "Victory first, then duty, then home."]
+  [72.39, 75.81, "Victory first, then duty, then home."],
+  [76.3, 80.68, "That is why there is a gap between Dussehra and Diwali."]
 ];
 function wrapText(ctx,text,max){if(ctx.measureText(text).width>max){const w=text.split(' ');let best=null;for(let k=1;k<w.length;k++){const a=w.slice(0,k).join(' '),b=w.slice(k).join(' '),m=Math.max(ctx.measureText(a).width,ctx.measureText(b).width);if(m<=max&&(!best||m<best.m))best={m,l:[a,b]}}if(best)return best.l}const words=text.split(' '),lines=[];let line='';for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>max&&line){lines.push(line);line=word}else line=test}if(line)lines.push(line);return lines}
 function captionGround(ctx,a){if(a<=0)return;const g=ctx.createLinearGradient(0,850,0,1080);g.addColorStop(0,'rgba(238,226,202,0)');g.addColorStop(.35,`rgba(238,226,202,${.82*a})`);g.addColorStop(1,`rgba(238,226,202,${.9*a})`);ctx.save();ctx.fillStyle=g;ctx.fillRect(0,850,W,230);ctx.restore()}
@@ -109,7 +110,7 @@ window.renderFrame=function(t){
   // fade in from paper at the start, and the closing greeting
   if(t<.8){ctx.save();ctx.globalAlpha=1-ease(t/.8);ctx.fillStyle='#EDE3CE';ctx.fillRect(0,0,W,H);ctx.restore()}
   const title=1-ease((t-5.2)/.9);if(title>0){const g=ctx.createLinearGradient(0,0,0,250);g.addColorStop(0,`rgba(238,226,202,${.85*title})`);g.addColorStop(1,'rgba(238,226,202,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,250);text(ctx,'Dussehra to Diwali',540,118,{size:96,alpha:title});text(ctx,'the long way home',540,170,{size:42,color:UMBER,alpha:title})}
-  const sig=ease((t-74.9)/1.2);if(sig>0){const g=ctx.createLinearGradient(0,0,0,230);g.addColorStop(0,`rgba(238,226,202,${.85*sig})`);g.addColorStop(1,'rgba(238,226,202,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,230);text(ctx,'शुभ दीपावली',540,128,{size:80,font:DEVA,alpha:sig});text(ctx,'Sukratu Labs',1040,1052,{size:28,color:PENCIL,alpha:sig*.9,align:'right'})}
+  const sig=ease((t-80.9)/1.2);if(sig>0){const g=ctx.createLinearGradient(0,0,0,230);g.addColorStop(0,`rgba(238,226,202,${.85*sig})`);g.addColorStop(1,'rgba(238,226,202,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,230);text(ctx,'शुभ दीपावली',540,128,{size:80,font:DEVA,alpha:sig});text(ctx,'Sukratu Labs',1040,1052,{size:28,color:PENCIL,alpha:sig*.9,align:'right'})}
   if(captions){const cue=captionCues.find(l=>t>=l[0]-.3&&t<l[1]+.3);captionGround(ctx,cue?clamp(Math.min(t-(cue[0]-.3),cue[1]+.3-t)/.3):0);drawCaption(ctx,t)}
 };
 /* APP */
