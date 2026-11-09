@@ -44,6 +44,9 @@
 - **Symbols, not figures:** bow and arrow, a ten-spired crown, a pyre, crown + chhatra + kalash (abhisheka), a lotus through fire, a winged chariot, a mace with a saffron streak, sandals on a throne, footprints. Watch for accidental faces: two oval sandals under an open arch read as eyes, so the throne back became a solid cusped panel and the sandals were splayed.
 - **Alpha-respecting toolkit:** `hatch`, `groundWash`, `drawShrub`, `drawFlame`, `label2`, `footprint`, `ribbon`, `stars`, `nightWash` now multiply by the incoming `globalAlpha` in this film (fixes the pitfall noted above at the source). `diya()` no longer passes `ctx.globalAlpha` to `drawFlame`.
 
+- **Detail pass, then generated paintings:** the user found the symbol-only scenes too basic. A detailed scenery library (cached vignettes: skies, scrolled clouds, palaces, arcades, palms, seas, carpets) rebuilt beats 1 and 4 in code, then the user chose generated paintings with people instead. Compared on two beats (Higgsfield connector): Nano Banana Pro (closest to the reference's restraint), FLUX 3 (lavish, devotional-print look, slow), **GPT Image 2.6 high/2K** (best people; chosen). Ten frames cost 27.5 credits plus one 2.75 map re-roll. Lessons in `dussehra-diwali-film/brief/IMAGE-PROMPTS.md`: a generated frame with people as a second reference trips the content filter; "a woman among flames" does too (reframed); ~4 concurrent jobs max; name real geography explicitly for maps.
+- **Image pipeline:** `index.html` draws each JPEG with a per-beat camera (`CAM[]` zoom/focus, clamped to the frame), dissolves at beat boundaries, a paper-coloured caption band, title and closing card. The code-drawn version is kept as `index-drawn.html`.
+
 ## Open items
 - Redraw the hands (beats 1 and 13); recolour the bow; fix beat 4's opening zoom.
 - Make the voiceover pipeline a single script (currently JS generation + Python assembly).
@@ -51,4 +54,4 @@
 - Port the clean-edge compositor (and caption change) back to `painted-film/` if wanted.
 - Re-centre Diwali beats 2-10 vertically like beat 1 (a follow-up session was started).
 - Listen to the Diwali voiceover for pacing and Hindi-term pronunciation.
-- Dussehra-to-Diwali film: user review of the compressed render (pacing, the 77.5 s length, Indic-term pronunciation); port the alpha-respecting helpers back to `diwali-film/` and `painted-film/` if wanted.
+- Dussehra-to-Diwali film: user review of the painted (image) render; pacing and Indic-term pronunciation by ear; port the alpha-respecting helpers and scenery library back to `diwali-film/` and `painted-film/` if wanted.
