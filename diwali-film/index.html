@@ -263,7 +263,7 @@ addBeat('b2',B[1],B[2],st0,(tl,s)=>{
   tl.to(s,{lab:1,duration:.9,ease:'power1.out'},.5);
   drift(tl,s,B[2]-B[1],1.03);
 },(ctx,st,lt)=>{
-  camera(ctx,st,()=>{
+  camera(ctx,st,()=>{ctx.translate(0,74); /* vertical centring: beat 2 */
     groundWash(ctx,{x0:90,x1:990,y:760,h:36,seed:140,shrub:null});
     for(let i=0;i<5;i++){diya(ctx,540+(i-2)*188-26,690,1.15,lt,{lit:st['l'+i],seed:10+i})}
     label2(ctx,'दीपावली',540,360,{size:104,font:DEVA,alpha:st.lab});
@@ -320,7 +320,7 @@ addBeat('b4',B[3],B[4],st0,(tl,s)=>{
   tl.to(s,{home:1,duration:1.8,ease:'power1.inOut'},4.1);
   drift(tl,s,B[4]-B[3],1.025);
 },(ctx,st,lt)=>{
-  camera(ctx,st,()=>{
+  camera(ctx,st,()=>{ctx.translate(0,23); /* vertical centring: beat 4, union of tally and road */
     // tally: 14 ink strokes, four with a slash
     ctx.save();
     const grp=[5,5,4];let idx=0;
@@ -361,7 +361,7 @@ addBeat('b5',B[4],B[5],st0,(tl,s)=>{
   drift(tl,s,B[5]-B[4],1.03);
 },(ctx,st,lt)=>{
   const L=st.L,bx=lerp(210,820,st.boat);
-  camera(ctx,st,()=>{
+  camera(ctx,st,()=>{ctx.translate(0,115); /* vertical centring: beat 5 */
     nightWash(ctx,wash,{alpha:(.95-.2*L)*st.wash,y0:110,y1:720});
     stars(ctx,57,34,180,160,900,480,.9*st.wash);
     // a new moon: only the faintest pencil sliver
@@ -399,7 +399,7 @@ addBeat('b6',B[5],B[6],st0,(tl,s)=>{
   tl.to(s,{lit:1,duration:1.4,ease:'power2.out'},4.9);
   drift(tl,s,B[6]-B[5],1.035);
 },(ctx,st,lt)=>{
-  camera(ctx,st,()=>{
+  camera(ctx,st,()=>{ctx.translate(0,84); /* vertical centring: beat 6, drawing only; label undone below */
     const cx=470,cy=540,S=3.1;
     groundWash(ctx,{x0:170,x1:880,y:cy+120,h:46,seed:600,shrub:null});
     diya(ctx,cx,cy,S,lt,{lit:st.lit,seed:61});
@@ -410,6 +410,7 @@ addBeat('b6',B[5],B[6],st0,(tl,s)=>{
     label2(ctx,'clay',cx-258,cy+232,{size:62,alpha:st.clay,align:'center'});
     label2(ctx,'oil',cx-262,cy-210,{size:62,alpha:st.oil,align:'center'});
     label2(ctx,'wick',cx+3.1*58+105,cy+220,{size:62,alpha:st.wick,align:'center'});
+    ctx.translate(0,-84);
     label2(ctx,'मिट्टी · तेल · बाती',540,170,{size:46,font:DEVA,color:C.umber,alpha:.8*clamp((lt-1.2)/1)});
   });
 });
@@ -430,13 +431,14 @@ addBeat('b7',B[6],B[7],st0,(tl,s)=>{
   tl.to(s,{l0:1,duration:.6},2.9);tl.to(s,{l1:1,duration:.6},3.3);
   drift(tl,s,B[7]-B[6],1.03);
 },(ctx,st,lt)=>{
-  camera(ctx,st,()=>{
+  camera(ctx,st,()=>{ctx.translate(0,35); /* vertical centring: beat 7, drawing only; title undone below */
     dotField(ctx,{points:dots,progress:st.dots,t:lt,color:C.ink,radius:3.4,seed:700});
     const all=petals.concat(petals2);
     all.forEach((p,i)=>{const q=clamp(st.line*all.length*.7-i*.55);ctx.save();ctx.globalAlpha=clamp(st.fill*1.6-(i>=8?.2:0))*.78;ctx.fillStyle=p.col;if(st.fill>0){tracePath(ctx,p.pts,true,true);ctx.fill();crossHatch(ctx,p.pts,{seed:710+i,t:lt,angle:p.a,spacing:7,weight:.5,density:.35*st.fill})}ctx.restore();inkStroke(ctx,p.pts,{seed:710+i,t:lt,width:1.5,amp:.7,closed:true,smooth:true,progress:clamp(q)})});
     // centre
     const c0=clamp(st.line*1.3);if(c0>0){ctx.save();ctx.globalAlpha=st.fill;ctx.fillStyle=C.gold;ctx.beginPath();ctx.arc(cx,cy,48,0,TAU);ctx.fill();ctx.fillStyle=C.terra;ctx.beginPath();ctx.arc(cx,cy,24,0,TAU);ctx.fill();ctx.restore();inkStroke(ctx,pointsCircle(cx,cy,48,40),{seed:720,t:lt,width:1.7,amp:.6,closed:true,smooth:true,progress:c0});inkStroke(ctx,pointsCircle(cx,cy,24,30),{seed:721,t:lt,width:1.4,amp:.5,closed:true,smooth:true,progress:c0})}
     diya(ctx,150,900,1.05,lt,{lit:st.l0,seed:730});diya(ctx,810,900,1.05,lt,{lit:st.l1,seed:731});
+    ctx.translate(0,-35);
     label2(ctx,'रंगोली',540,140,{size:76,font:DEVA,alpha:st.lab});label2(ctx,'rangoli',540,192,{size:48,color:C.umber,alpha:st.lab*.85});
   });
 });
@@ -453,7 +455,7 @@ addBeat('b8',B[7],B[8],st0,(tl,s)=>{
   tl.to(s,{prints:1,duration:2.4,ease:'none'},5.7);
   drift(tl,s,B[8]-B[7],1.03);
 },(ctx,st,lt)=>{
-  camera(ctx,st,()=>{
+  camera(ctx,st,()=>{ctx.translate(0,-25); /* vertical centring: beat 8 */
     if(st.row>0){ctx.save();ctx.globalAlpha=st.row;
       groundWash(ctx,{x0:90,x1:990,y:830,h:34,seed:800,alpha:st.row});
       for(let i=0;i<5;i++){const x=540+(i-2)*188;
@@ -479,7 +481,7 @@ addBeat('b8',B[7],B[8],st0,(tl,s)=>{
 
 /* ===================== BEAT 9: many tellings, one flame ===================== */
 {
-const spots=[[310,330],[770,330],[310,690],[770,690]];
+const spots=[[310,404],[770,404],[310,764],[770,764]]; // start spots, shifted +74 to centre the scene; they still converge on the fixed hero diya
 const syms=[lantern,lotus,boat,quiver];
 const st0={camera:mkCam(),v0:0,v1:0,v2:0,v3:0,m:0,cd:0,lit:0};
 addBeat('b9',B[8],B[9],st0,(tl,s)=>{
