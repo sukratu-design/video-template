@@ -9,7 +9,7 @@ const L=[
  "Then विभीषण was crowned king of लंका, as राम had promised.",
  "सीता passed through fire, the अग्नि परीक्षा. अग्नि, the fire itself, returned her unharmed.",
  "विभीषण gave them the पुष्पक विमान, a flying chariot, and they turned north.",
- "Over the bridge they had built, past किष्किंधा, to Sage भारद्वाज's ashram, where the rivers meet.",
+ "Over the bridge they had built, past किष्किंधा, to Sage भारद्वाज's ashram, where the गंगा and यमुना meet.",
  "हनुमान raced ahead to tell भरत, who for fourteen years had kept राम's sandals on the throne.",
  "The fourteen years were over. The sandals were returned, and राम came home.",
  "Tradition says अयोध्या lit lamps to welcome him. Victory first, then duty, then home.",
