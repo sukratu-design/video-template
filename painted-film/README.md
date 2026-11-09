@@ -21,6 +21,8 @@ A code-only (HTML canvas + GSAP) 1080×1080, 30 fps film template whose look is 
 - `examples/karma-plain-style-madhur.mp4`: the earlier flat/ink-on-navy-and-warm version with the Madhur voice, for comparison. 8.6 MB.
 - `examples/vo-shubh-sarvam.mp3`: the final voiceover track, 68 s.
 
+A second film built from this template: `../diwali-film/` ("A Row of Lamps", Diwali explainer). See `docs/PAINTED-FILM-HISTORY.md`.
+
 ## Run
 ```bash
 cd painted-film
