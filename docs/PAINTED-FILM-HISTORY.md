@@ -47,6 +47,8 @@
 - **Detail pass, then generated paintings:** the user found the symbol-only scenes too basic. A detailed scenery library (cached vignettes: skies, scrolled clouds, palaces, arcades, palms, seas, carpets) rebuilt beats 1 and 4 in code, then the user chose generated paintings with people instead. Compared on two beats (Higgsfield connector): Nano Banana Pro (closest to the reference's restraint), FLUX 3 (lavish, devotional-print look, slow), **GPT Image 2.6 high/2K** (best people; chosen). Ten frames cost 27.5 credits plus one 2.75 map re-roll. Lessons in `dussehra-diwali-film/brief/IMAGE-PROMPTS.md`: a generated frame with people as a second reference trips the content filter; "a woman among flames" does too (reframed); ~4 concurrent jobs max; name real geography explicitly for maps.
 - **Image pipeline:** `index.html` draws each JPEG with a per-beat camera (`CAM[]` zoom/focus, clamped to the frame), dissolves at beat boundaries, a paper-coloured caption band, title and closing card. The code-drawn version is kept as `index-drawn.html`.
 
+- **Final (locked 9 Nov):** 85.5 s = 1.5 s cover lead (title over frame 10, so the upload can use frame 0 as thumbnail) + 84 s film. Sound effects removed; closing line "That is why there is a gap between Dussehra and Diwali."; the map line names the Ganga and Yamuna. Score: a code-synthesized Raga Bhupali was rejected by ear ("the audio isn't good"); two ElevenLabs Music v2.5 tracks (sitar-led and bansuri-led Raga Yaman, 12.21 credits each) were generated and the bansuri one chosen. Final `vo.mp3` and `music.mp3` are committed so the locked film can be re-rendered exactly.
+
 ## Open items
 - Redraw the hands (beats 1 and 13); recolour the bow; fix beat 4's opening zoom.
 - Make the voiceover pipeline a single script (currently JS generation + Python assembly).
@@ -54,4 +56,4 @@
 - Port the clean-edge compositor (and caption change) back to `painted-film/` if wanted.
 - Re-centre Diwali beats 2-10 vertically like beat 1 (a follow-up session was started).
 - Listen to the Diwali voiceover for pacing and Hindi-term pronunciation.
-- Dussehra-to-Diwali film: user review of the painted (image) render; pacing and Indic-term pronunciation by ear; port the alpha-respecting helpers and scenery library back to `diwali-film/` and `painted-film/` if wanted.
+- Dussehra-to-Diwali film: FINAL. Optional: port the alpha-respecting helpers and scenery library back to `diwali-film/` and `painted-film/`; consider making the image pipeline (paintings + camera + captions + generated score + cover lead) a reusable template.

@@ -1,5 +1,7 @@
 # dussehra-diwali-film: "Dussehra to Diwali, the long way home"
 
+**Status: FINAL, locked 9 Nov 2026.** 1080×1080, 85.5 s (1.5 s cover + 84 s film). Delivered render: `node render.mjs` → H.264 CRF 16, AAC 192k, −16 LUFS (sha256 prefix `cdaf33cf9cd664eb`). To keep it reproducible, the final `vo.mp3` (Sarvam takes, not deterministic) and `music.mp3` (ElevenLabs Music v2.5 via Higgsfield, bansuri-led Raga Yaman, job `2c1e0939-9f9f-4248-97db-ed53e8f79b04`) are committed, an exception to the usual gitignore.
+
 A 77.5 s, 1080×1080 painted explainer on why Rama reached Ayodhya (Diwali) only some time after his victory over Ravana (Dussehra). See `brief/SCRIPT.md` for the beat table and accuracy notes.
 
 **Two versions:**

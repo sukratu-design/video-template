@@ -19,3 +19,5 @@ dussehra-diwali-film/voiceover/shubh_t/
 dussehra-diwali-film/voiceover/*.pcm
 dussehra-diwali-film/music.mp3
 dussehra-diwali-film/music-*.mp3
+!dussehra-diwali-film/vo.mp3
+!dussehra-diwali-film/music.mp3
