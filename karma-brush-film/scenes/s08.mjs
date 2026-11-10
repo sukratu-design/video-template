@@ -42,11 +42,11 @@ export default function(opt={}){const free=!!opt.free;const p=new Painting({...o
   const post=p.mask(ellipse(cx,cy,17,17));fill(p,post,hex('#6a4424'),{w:5,len:10,dir:1});form(p,post,3);
   if(!free){const oa=th+Math.PI/2;const T=ox(p,bx,by,oa,1.25);
     p.line([[bx+Math.cos(oa)*38-Math.sin(oa)*34,by+Math.sin(oa)*38+Math.cos(oa)*34],[bx+Math.cos(oa)*38+Math.sin(oa)*34,by+Math.sin(oa)*38-Math.cos(oa)*34]],{w:7,col:hex('#6a4424'),raw:true,thick:1.6});
-    const da=th-.62;const dx=cx+Math.cos(da)*(R0+R1)/2,dy=cy+Math.sin(da)*(R0+R1)/2;person(p,{x:dx,y:dy,rot:da+Math.PI,s:1.75,top:C.white,bottom:hex('#e3d3b0'),turban:C.vermilion,skin:SKIN[1],arms:[[-18,6],[22,-18]],stride:7,shadow:6})}
+    const da=th-.62;const dx=cx+Math.cos(da)*(R0+R1)/2,dy=cy+Math.sin(da)*(R0+R1)/2;person(p,{x:dx,y:dy,rot:da+Math.PI,s:1.75,top:C.white,bottom:hex('#e3d3b0'),turban:C.vermilion,skin:SKIN[1],arms:[[-18,6],[22,-18]],stride:7,kurta:true})}
   else{ // unyoked: the ox grazes, the yoke lies in the dust, someone walks out along the path, birds overhead
     p.line([[bx-30,by-34],[bx+34,by+30]],{w:7,col:hex('#6a4424'),raw:true,thick:1.6});
     ox(p,880,560,2.5,1.2);
-    person(p,{x:cx+4,y:150,rot:.04,s:1.5,top:C.white,bottom:hex('#e3d3b0'),turban:C.vermilion,skin:SKIN[1],arms:[[-17,8],[17,6]],stride:7,shadow:8});
+    person(p,{x:cx+4,y:150,rot:.04,s:1.5,top:C.white,bottom:hex('#e3d3b0'),turban:C.vermilion,skin:SKIN[1],arms:[[-17,8],[17,6]],stride:7,kurta:true,shadow:1.3});
     const sp=[[cx+2,cy-R0+30],[cx+6,cy-R1-20],[cx,330],[cx+2,230]];for(let i=0;i<13;i++){const t=i/13;const y=cy-R0+20-(cy-R0-210)*t;p.dab(cx+3+(i%2?7:-7),y,-1.57,11,4.5,hex('#c9a66e'),{opacity:.8,thick:.5})}
     [[300,330,-1.9,2],[215,430,-1.8,1.6],[770,250,-1.2,1.8]].forEach(([x,y,a,s])=>bird(p,x,y,a,s,hex('#f6f1e4'),26))}
   return p}

@@ -18,26 +18,52 @@ export function form(p,m,d=3,k=1){const S=p.S;const a=m.sub(m.moved(-SUN[0]*d*S,
 // fill a small shape solidly with short strokes
 export function fill(p,m,col,o={}){return p.area(m,{w:5,len:13,density:3.2,clip:true,jit:{l:.035,s:.05,h:.006},dirJit:.2,taper:.25,thick:.8,wet:.1,gap:.02,...o,col})}
 
-// a person seen from above (drawn as if lying on the ground plane, like figures on a map)
-export function person(p,o){const{x,y,rot=0,s=1,top=C.white,bottom=C.cream,skin=SKIN[0],hair=C.ink,turban=null,skirt=false,
-    stride=0,shadow=5,sash=null,reach=[]}=o;let arms=(o.arms||[[-17,8],[17,8]]).slice();
-  reach.forEach((w,i)=>{if(!w)return;const dx=w[0]-x,dy=w[1]-y,c=Math.cos(-rot),sn=Math.sin(-rot);arms[i]=[(dx*c-dy*sn)/s,(dx*sn+dy*c)/(s*.9)]});
-  const T=pts=>xf(pts,{x,y,rot,sx:s,sy:s*.9});const M=(...q)=>p.mask(...q.map(T));const ax=rot+Math.PI/2;
-  const parts=[];
-  if(skirt)parts.push({m:M(spline([[-11,8],[11,8],[16,50],[0,53],[-16,50]],true,6)),col:bottom,dir:ax,w:6});
-  else{parts.push({m:M(capsule(-6,10,-7,48+stride,6.5,5)),col:bottom,dir:ax,w:5});parts.push({m:M(capsule(6,10,7,48-stride,6.5,5)),col:bottom,dir:ax,w:5});
-    parts.push({m:M(ellipse(-7,52+stride,4.5,6)),col:skin,dir:ax,w:4});parts.push({m:M(ellipse(7,52-stride,4.5,6)),col:skin,dir:ax,w:4})}
-  const armParts=[];arms.forEach((h,i)=>{if(!h)return;const sx=i?14:-14,sy=-17;const ex=(sx+h[0])/2+(i?4:-4),ey=(sy+h[1])/2;
-    armParts.push({m:M(capsule(sx,sy,ex,ey,5.6,4.8),capsule(ex,ey,h[0],h[1],4.8,4)),col:o.sleeve===false?skin:top,dir:rot+Math.atan2(h[1]-sy,h[0]-sx),w:4.5});
-    armParts.push({m:M(ellipse(h[0],h[1],4.3,4.3)),col:skin,dir:ax,w:4})});
-  const torso={m:M(spline([[-14,-21],[0,-25],[14,-21],[12,12],[0,15],[-12,12]],true,6)),col:top,dir:ax,w:6};
-  const head={m:M(ellipse(0,-33,turban?12.5:10,turban?12:10.5)),col:turban||hair,dir:rot,w:4.5};
-  const all=[...parts,...armParts,torso,head];
-  if(shadow){let sh=null;for(const q of all){const mm=q.m.moved(SUN[0]*shadow*s*p.S,SUN[1]*shadow*s*p.S);sh=sh?sh.or(mm):mm}p.glaze(sh,SHADOW)}
-  for(const q of all){fill(p,q.m,q.col,{w:q.w*Math.sqrt(s),len:q.w*2.6*Math.sqrt(s),dir:q.dir});form(p,q.m,2.2*s,.9)}
-  if(sash){p.line([T([[-12,-20]])[0],T([[2,-4]])[0],T([[11,11]])[0]],{w:5*s,col:sash,thick:.9})}
-  if(turban){const c=T([[0,-33]])[0];for(let i=0;i<3;i++){const r=(4+i*3.2)*s;p.line(ellipse(c[0],c[1],r,r*.9,rot+i,9).slice(0,7),{w:2.2*s,col:shift(turban,{l:i%2?.07:-.07}),thick:1.2})}}
-  else{const c=T([[2,-35]])[0];p.dab(c[0],c[1],rot+.4,7*s,3*s,shift(hair,{l:.1}),{thick:.8})}
+// a person seen from above and a little to one side: head over broad shoulders, body foreshortened,
+// and a long shadow that starts at the feet and falls away from the sun (that is what makes them stand up).
+// Local coords: head toward -y, feet at y=40. Options: turban | hair (+bun, braid), skirt (sari/lehenga), kurta (long tunic),
+// arms as local hand positions or reach as world targets, sash, hem (border colour), shadow (length factor, 0 for none).
+export function person(p,o){const{x,y,rot=0,s=1,top=C.white,bottom=C.cream,skin=SKIN[0],hair=C.ink,turban=null,skirt=false,kurta=false,
+    stride=0,shadow=1,sash=null,hem=null,bun=false,braid=false,reach=[]}=o;let arms=(o.arms||[[-19,6],[19,6]]).slice();const FY=.8;
+  reach.forEach((w,i)=>{if(!w)return;const dx=w[0]-x,dy=w[1]-y,c=Math.cos(-rot),sn=Math.sin(-rot);arms[i]=[(dx*c-dy*sn)/s,(dx*sn+dy*c)/(s*FY)]});
+  const T=pts=>xf(pts,{x,y,rot,sx:s,sy:s*FY});const ax=rot+Math.PI/2;const q=Math.sqrt(s);
+  // every part as a local polygon first, so the shadow can be projected from the same shapes
+  const L=[];const add=(polys,col,dir,w,kind)=>L.push({polys,col,dir,w,kind});
+  if(skirt)add([spline([[-12,6],[12,6],[18,36],[8,41],[-8,41],[-18,36]],true,6)],bottom,ax,6,'cloth');
+  else{add([capsule(-6.5,8,-7.5,33+stride,6.4,5)],bottom,ax,5,'cloth');add([capsule(6.5,8,7.5,33-stride,6.4,5)],bottom,ax,5,'cloth');
+    add([ellipse(-7.8,38+stride,4.4,6.4)],skin,ax,3.5,'skin');add([ellipse(7.8,38-stride,4.4,6.4)],skin,ax,3.5,'skin')}
+  if(kurta)add([spline([[-13,4],[13,4],[15,22],[0,25],[-15,22]],true,6)],top,ax,6,'cloth');
+  const armL=[];arms.forEach((h,i)=>{if(!h)return;const sx=i?15:-15,sy=-15;const dx=h[0]-sx,dy=h[1]-sy,d=Math.hypot(dx,dy)||1;const bend=Math.max(0,34-d)*.42*(i?1:-1);
+    const ex=sx+dx*.5-dy/d*bend,ey=sy+dy*.5+dx/d*bend;const an=rot+Math.atan2(dy,dx);
+    armL.push({polys:[capsule(sx,sy,ex,ey,6,4.9)],col:top,dir:an,w:4.6,kind:'cloth'});
+    armL.push({polys:[capsule(ex,ey,h[0],h[1],4.2,3.4)],col:skin,dir:an,w:3.6,kind:'skin'});
+    armL.push({polys:[ellipse(h[0],h[1],4.1,4.6,Math.atan2(dy,dx))],col:skin,dir:an,w:3.4,kind:'skin'})});
+  const front=armL.filter((_,i)=>arms[(i/3)|0]&&arms[(i/3)|0][1]>-6),back=armL.filter(a=>!front.includes(a));
+  L.push(...back);
+  add([spline([[-17,-16],[-10,-22],[10,-22],[17,-16],[14,5],[0,9],[-14,5]],true,6)],top,ax,6,'cloth');
+  L.push(...front);
+  add([ellipse(0,-24,turban?12.6:10.4,turban?11.8:10.6)],turban||hair,rot,4.4,'head');
+  if(bun)add([ellipse(0,-13,5.4,5)],hair,rot,3.4,'head');
+  if(shadow){const A=Math.atan2(SUN[1],SUN[0]);const ux=Math.cos(A),uy=Math.sin(A);const F=T([[0,40]])[0];const len=.82*shadow*s,wd=.8*s;
+    const map=([px,py])=>{const along=(40-py)*len,side=px*wd;return[F[0]+ux*along-uy*side,F[1]+uy*along+ux*side]};
+    let sh=null;for(const part of L)for(const poly of part.polys){const m=p.mask(poly.map(map));sh=sh?sh.or(m):m}
+    const fm=p.mask(T(ellipse(0,38,13,6)));p.glaze(sh.or(fm),{...SHADOW,alpha:.58})}
+  const masks=[];
+  for(const part of L){const m=p.mask(...part.polys.map(T));masks.push(m);const pal=part.kind==='skin'?[part.col,shift(part.col,{l:.03}),shift(part.col,{l:-.03})]:[part.col,shift(part.col,{l:.025}),shift(part.col,{l:-.03,s:.05})];
+    fill(p,m,pal,{w:part.w*q,len:part.w*2.7*q,dir:part.dir,density:3.4});form(p,m,2.4*s,part.kind==='head'?1.1:.95)}
+  const pt=(lx,ly)=>T([[lx,ly]])[0];const ln=(pts,o2)=>p.line(pts.map(([a,b])=>pt(a,b)),o2);
+  // cloth details: folds, hem, sash, placket
+  const fold=shift(top,{l:-.09,s:.08}),foldB=shift(bottom,{l:-.09,s:.08});
+  ln([[-9,-12],[-7,-2],[-9,5]],{w:1.6*s,col:fold,opacity:.6,thick:.6});ln([[9,-13],[8,-3],[10,4]],{w:1.6*s,col:fold,opacity:.6,thick:.6});
+  if(skirt){for(const k of[-9,-3,4,10])ln([[k*.6,9],[k*1.05,24],[k*1.3,38]],{w:1.7*s,col:foldB,opacity:.55,thick:.6});
+    if(hem)ln([[-17,36],[-8,40.5],[0,41],[8,40.5],[17,36]],{w:3.2*s,col:hem,thick:1.4})}
+  else if(kurta){ln([[0,-8],[0,8],[0,22]],{w:1.4*s,col:fold,opacity:.6,thick:.6});if(hem)ln([[-14,21.5],[0,24.5],[14,21.5]],{w:2.6*s,col:hem,thick:1.3})}
+  if(sash){ln([[-14,-17],[-2,-6],[10,6]],{w:5.2*s,col:sash,thick:1.1,tone:.1});ln([[-13,-16],[-2,-5],[9,5]],{w:1.4*s,col:shift(sash,{l:.12}),thick:1.5,opacity:.7})}
+  // head: turban wound in bands with a knot, or hair with a parting and a highlight
+  const hc=pt(0,-24);
+  if(turban){for(let i=0;i<4;i++){const r=(3+i*3)*s;p.line(ellipse(hc[0],hc[1],r*1.04,r*.84,rot+i*.9,10).slice(0,8),{w:2.3*s,col:shift(turban,{l:i%2?.08:-.08}),thick:1.3})}
+    p.dab(...pt(3,-27),rot+.5,6*s,3.4*s,shift(turban,{l:.14}),{thick:1.6});ln([[9,-18],[14,-12],[13,-5]],{w:3.4*s,col:shift(turban,{l:-.04}),thick:1.2})}
+  else{ln([[0,-33],[0,-24]],{w:1.3*s,col:shift(hair,{l:.16}),opacity:.6,thick:1});p.dab(...pt(-4,-27),rot+1.2,7*s,2.6*s,shift(hair,{l:.13}),{thick:1,opacity:.8});
+    if(braid){ln([[0,-14],[1,-2],[-1,10]],{w:3.6*s,col:hair,thick:1.4});p.dab(...pt(-1,12),ax,5*s,3*s,C.vermilion,{thick:1.4})}}
   return{T,hands:arms.map(h=>h?T([h])[0]:null)}}
 
 export function mango(p,x,y,rot=0,s=1,ripe=1,shadow=4){const out=T=>xf(spline([[-17,1],[-10,-10],[4,-12.5],[15,-7],[18.5,3],[10,11.5],[-4,11],[-13,7.5]],true,6),{x,y,rot,sx:s*T,sy:s*T});

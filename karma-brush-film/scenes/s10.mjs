@@ -27,6 +27,6 @@ export default function(opt={}){const p=new Painting({...opt,seed:1010,ground:he
   // the one who did all this is already leaving, broom over the shoulder, long shadow behind
   const bq=[[262,150],[150,285]];p.line(bq.map(([x,y])=>[x+SUN[0]*16,y+SUN[1]*16]),{w:6,col:hex('#6a5a6a'),opacity:.45,raw:true,thick:.2});p.line(bq,{w:6,col:hex('#8a5a2e'),raw:true,thick:1.5});
   for(let i=0;i<12;i++){const a=2.2+(i-6)*.06;p.line([[150,285],[150+Math.cos(a)*74,285+Math.sin(a)*74]],{w:4,col:[hex('#d9b77c'),hex('#c49a5e'),hex('#e3c690')][i%3],raw:true,thick:1.4,dry:.5})}
-  person(p,{x:205,y:150,rot:-.62,s:2.05,top:C.white,bottom:hex('#e3d3b0'),turban:C.saffron,skin:SKIN[1],arms:[[-18,6],null],reach:[null,[250,165]],stride:8,shadow:14});
+  person(p,{x:205,y:150,rot:-.62,s:2.05,top:C.white,bottom:hex('#e3d3b0'),turban:C.saffron,skin:SKIN[1],arms:[[-18,6],null],reach:[null,[250,165]],stride:8,kurta:true,shadow:2});
   for(let i=0;i<9;i++){const t=i/9;p.dab(455-t*190+(i%2?7:-7),545-t*270,-2.2,11,4.5,hex('#b98a7a'),{opacity:.7,thick:.5})}
   return p}

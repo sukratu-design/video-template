@@ -20,7 +20,7 @@ export default function(opt={}){const p=new Painting({...opt,seed:404,ground:hex
   // the shaded inner wall falls across the seeds
   p.glaze(inner.sub(inner.moved(SUN[0]*52*p.S,SUN[1]*52*p.S)),{tint:[.45,.4,.62],alpha:.62});
   // someone adds today's seed; a few lie spilled on the floor
-  person(p,{x:150,y:170,rot:-.75,s:2.15,top:C.teal,bottom:C.rose,skirt:true,hair:C.ink,skin:SKIN[0],arms:[[-16,10],null],reach:[null,[262,292]],shadow:6,sash:C.gold});
-  p.dab(268,300,.7,40,18,hex('#e6d2a4'),{taper:.6,thick:1.5,tone:.11});
+  person(p,{x:150,y:170,rot:-.75,s:2.15,top:C.teal,bottom:C.rose,skirt:true,hair:C.ink,skin:SKIN[0],arms:[[-16,10],null],reach:[null,[212,246]],sash:C.gold,hem:C.gold,bun:true});
+  p.dab(226,262,.7,40,18,hex('#e6d2a4'),{taper:.6,thick:1.5,tone:.11});
   [[90,640,.4],[120,720,2],[970,150,1.1],[60,900,2.6],[1010,990,.3]].forEach(([x,y,a])=>{p.dab(x+5,y+5,a,38,17,hex('#3a2018'),{taper:.55,opacity:.6,thick:.3});p.dab(x,y,a,38,17,husk[(rn()*6)|0],{taper:.6,thick:1.5,tone:.11})});
   return p}

@@ -30,6 +30,6 @@ export default function(opt={}){const p=new Painting({...opt,seed:1111,ground:he
   // a bowl of seeds not yet roasted, and the one who tends the fire
   const bi=vessel(p,250,330,70,[hex('#c9973a'),hex('#b8862c'),hex('#e0a848')],{h:0,inside:hex('#3a2a1c')});
   for(let i=0;i<9;i++){const a=i*2.4,d=8+i*4.6;p.dab(250+Math.cos(a)*d,330+Math.sin(a)*d,a*1.3,34,15,[hex('#d9bf8c'),hex('#e6d2a4'),hex('#cdb07a')][i%3],{taper:.6,thick:1.5,tone:.11})}
-  person(p,{x:270,y:770,rot:.95,s:2.3,top:hex('#d9cfc0'),bottom:hex('#b8a890'),turban:C.vermilion,skin:SKIN[1],arms:[[-18,4],[28,-30]],stride:3,shadow:0});
+  person(p,{x:270,y:770,rot:.95,s:2.3,top:hex('#d9cfc0'),bottom:hex('#b8a890'),turban:C.vermilion,skin:SKIN[1],arms:[[-18,4],[28,-30]],stride:3,kurta:true,shadow:0});
   p.glow(cx,cy,330,hex('#ff9a3a'),.2,1.5);
   return p}

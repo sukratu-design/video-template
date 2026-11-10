@@ -1,1 +1,5 @@
 frames/*.png
+film/clips/
+film/ov/
+film/list.txt
+film/build.log

@@ -17,7 +17,7 @@ export default function(opt={}){const p=new Painting({...opt,seed:606,ground:hex
   canopy(p,520,480,430,6,{fruit:54,sh:60,ripe:undefined});
   const lad=xf([[0,0]],{})[0];const la=.95;for(const k of[-1,1])p.line(xf([[-150,22*k],[170,22*k]],{x:880,y:770,rot:la}),{w:7,col:hex('#8a5a2e'),raw:true,thick:1.5});
   for(let i=0;i<8;i++){const q=xf([[-130+i*40,-22],[-130+i*40,22]],{x:880,y:770,rot:la});p.line(q,{w:5,col:hex('#a8743e'),raw:true,thick:1.4})}
-  person(p,{x:300,y:960,rot:-.5,s:2.1,top:C.saffron,bottom:C.white,turban:C.vermilion,skin:SKIN[1],arms:[[-30,-22],[24,-26]],stride:4,shadow:6});
-  person(p,{x:760,y:935,rot:.5,s:1.7,top:C.rose,bottom:C.teal,skirt:true,skin:SKIN[0],reach:[[700,905],null],arms:[null,[16,10]],shadow:6});
+  person(p,{x:300,y:960,rot:-.5,s:2.1,top:C.saffron,bottom:C.white,turban:C.vermilion,skin:SKIN[1],arms:[[-30,-22],[24,-26]],stride:4,kurta:true});
+  person(p,{x:760,y:935,rot:.5,s:1.7,top:C.rose,bottom:C.teal,skirt:true,skin:SKIN[0],reach:[[700,905],null],arms:[null,[16,10]],hem:C.gold,braid:true});
   mango(p,694,900,.6,1.5,1,5);
   return p}

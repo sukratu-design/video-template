@@ -20,6 +20,6 @@ export default function(opt={}){const p=new Painting({...opt,seed:707,ground:hex
   const hm=p.mask(ellipse(cx,cy,22,22));p.area(hm,{w:5,len:10,density:3,col:C.gold,dir:0,dirJit:3,thick:1.7});
   // the makers: two people finishing the rim, bowls of colour beside them
   [[150,930,C.gold],[232,985,C.vermilion],[105,1010,hex('#2e7c64')],[925,120,hex('#9cbc54')],[1000,190,C.white],[965,60,C.rose]].forEach(([x,y,c],i)=>{const mi=vessel(p,x,y,34,[hex('#c9973a'),hex('#b8862c'),hex('#dcae52')],{h:7,rim:.2,inside:c});p.area(mi,{w:5,len:9,density:2,col:shift(c,{l:.06}),dir:i,dirJit:3,thick:1.6})});
-  person(p,{x:250,y:800,rot:1.05,s:1.9,top:C.vermilion,bottom:C.gold,skirt:true,skin:SKIN[0],arms:[[-20,-2],[30,-30]],shadow:5,sash:C.teal});
-  person(p,{x:860,y:250,rot:-2.2,s:1.9,top:C.indigo,bottom:C.white,turban:C.rose,skin:SKIN[1],arms:[[-28,-30],[20,0]],stride:3,shadow:5});
+  person(p,{x:250,y:800,rot:1.05,s:1.9,top:C.vermilion,bottom:C.gold,skirt:true,skin:SKIN[0],arms:[[-20,-2],[30,-30]],sash:C.teal,hem:C.vermilion,bun:true});
+  person(p,{x:860,y:250,rot:-2.2,s:1.9,top:C.indigo,bottom:C.white,turban:C.rose,skin:SKIN[1],arms:[[-28,-30],[20,0]],stride:3,kurta:true});
   return p}

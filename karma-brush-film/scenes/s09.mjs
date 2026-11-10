@@ -19,7 +19,7 @@ export default function(opt={}){const p=new Painting({...opt,seed:909,ground:hex
   // the new cloth, half unrolled, a deep fresh indigo
   const nx=base[0]+ox*2.1*128+120,ny=base[1]+oy*2.1*128+54;strip(nx,ny,112,470,C.indigo,C.gold);
   const roll=p.mask(xf(ellipse(0,0,26,62),{x:nx-Math.cos(a)*245,y:ny-Math.sin(a)*245,rot:a}));cast(p,roll,9);fill(p,roll,[C.indigo,shift(C.indigo,{l:.06})],{w:7,len:30,dir:a+1.57});form(p,roll,6,1.2);
-  person(p,{x:nx-Math.cos(a)*352,y:ny-Math.sin(a)*352+4,rot:a+1.57,s:1.9,top:C.gold,bottom:C.vermilion,skirt:true,skin:SKIN[0],arms:[[-24,-28],[24,-28]],shadow:5,sash:C.white});
+  person(p,{x:nx-Math.cos(a)*352,y:ny-Math.sin(a)*352+4,rot:a+1.57,s:1.9,top:C.gold,bottom:C.vermilion,skirt:true,skin:SKIN[0],arms:[[-24,-28],[24,-28]],sash:C.white,hem:C.gold,braid:true});
   // the old one: faded, threadbare and frayed, set aside
   const ocx=870,ocy=150,ol=360;const om=p.mask(rough(rect(ocx,ocy,ol,112,a-.12),7,.06,3));cast(p,om,4);
   p.area(om,{w:10,len:44,density:2.1,col:[hex('#c9b0a8'),hex('#bba29c'),hex('#d4beb2'),hex('#ad9896')],dir:a-.12,dirJit:.12,dry:.8,tone:.16,gap:.22,thick:.7,jit:{l:.03}});

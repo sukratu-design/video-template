@@ -16,8 +16,8 @@ export default function(opt={}){const evening=!!opt.evening;
   canopy(p,930,150,250,7,{fruit:9,sh:34});
   // the two people, and the mango between their hands
   const G=[590,520];
-  person(p,{x:400,y:500,rot:.22,s:3,top:C.white,bottom:hex('#e9dcc0'),turban:evening?C.rose:C.saffron,skin:SKIN[1],arms:[[-19,10],null],reach:[null,[G[0]-30,G[1]+6]],stride:5,shadow:6});
-  person(p,{x:770,y:560,rot:-.3,s:2.3,top:evening?C.teal:C.indigo,bottom:hex('#d8c9a8'),skin:SKIN[0],arms:[null,[18,10]],reach:[[G[0]+30,G[1]+10],null],stride:-4,shadow:6});
+  person(p,{x:400,y:500,rot:.22,s:3,top:C.white,bottom:hex('#e9dcc0'),turban:evening?C.rose:C.saffron,skin:SKIN[1],arms:[[-19,10],null],reach:[null,[G[0]-30,G[1]+6]],stride:5,kurta:true,hem:C.gold});
+  person(p,{x:770,y:560,rot:-.3,s:2.3,top:evening?C.teal:C.indigo,bottom:hex('#d8c9a8'),skin:SKIN[0],arms:[null,[18,10]],reach:[[G[0]+30,G[1]+10],null],stride:-4});
   mango(p,G[0],G[1],-.4,2.1,1,8);
   // a few fallen leaves
   const rn=p.rnd;for(let i=0;i<16;i++){const x=640+rn()*420,y=250+rn()*200;p.dab(x,y,rn()*6.28,16,6,[C.leaf,C.leafL,hex('#b8962e')][i%3],{thick:1.2,curve:.6})}

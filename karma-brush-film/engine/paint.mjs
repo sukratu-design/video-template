@@ -68,13 +68,13 @@ export class Painting{
   constructor({size=1080,scale=2,seed=1,ground=[.78,.66,.5]}={}){
     this.S=scale;this.size=size;const W=this.W=size*scale,H=this.H=size*scale;this.seed=seed;this.rnd=mulberry32(seed);
     this.c=new Float32Array(W*H*3);this.h=new Float32Array(W*H);this.strokes=0;
+    this.cov=arguments[0]&&arguments[0].onStroke?new Float32Array(W*H):null;this.onStroke=(arguments[0]&&arguments[0].onStroke)||null; // coverage + hook, used by the paint-on film
     // canvas tooth: woven threads plus fine noise, 0..1
     const g=this.grain=new Float32Array(W*H);const wv=Math.PI/(1.6*scale);
     for(let y=0;y<H;y++)for(let x=0;x<W;x++){const w=.5+.25*(Math.sin(x*wv)+Math.sin(y*wv))*(.75+.5*vnoise(x*.02,y*.02,seed+3));
       g[y*W+x]=clamp(.55*w+.45*hash2(x,y,seed)*.8+.2*(vnoise(x*.35,y*.35,seed+9)-.5))}
     for(let i=0;i<W*H;i++){const v=(g[i]-.5)*.05;this.c[i*3]=ground[0]+v;this.c[i*3+1]=ground[1]+v;this.c[i*3+2]=ground[2]+v}
-    this.snaps=null;
-  }
+      }
   // rasterise one or more closed polygons (logical coords) into a mask
   mask(...polys){const S=this.S;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;const P=polys.map(p=>p.map(([x,y])=>[x*S,y*S]));
     for(const p of P)for(const[x,y]of p){if(x<x0)x0=x;if(y<y0)y0=y;if(x>x1)x1=x;if(y>y1)y1=y}
@@ -88,7 +88,7 @@ export class Painting{
 
   // one brush stroke along a dense device-space path
   _stroke(px,py,wDev,col,o={}){
-    const W=this.W,H=this.H,c=this.c,hh=this.h,g=this.grain,r=this.rnd;const n=px.length;if(n<2)return;this.strokes++;
+    const W=this.W,H=this.H,c=this.c,hh=this.h,g=this.grain,r=this.rnd,cv=this.cov;const n=px.length;if(n<2)return;this.strokes++;
     const bs=o.bs||1.5;const nb=Math.max(2,Math.round(wDev/bs));
     const opacity=o.opacity??.96,thick=o.thick??1,wet=o.wet??.25,ragged=o.ragged??.12,tonev=o.tone??.07,gap=o.gap??.05,dry=o.dry??0,clip=o.clip||null,taper=o.taper??.5;
     const aS=1-Math.pow(1-opacity,.42);
@@ -109,9 +109,9 @@ export class Painting{
         if(wet){const p3=q*3,wv=wet*.06;br[i]+=(c[p3]-br[i])*wv;bg[i]+=(c[p3+1]-bg[i])*wv;bb[i]+=(c[p3+2]-bb[i])*wv}
         const R=br[i],G=bg[i],B=bb[i],ht=bh[i]*endBlob;
         for(let dy=-1;dy<=1;dy++){const row=(iy+dy)*W+ix;for(let dx=-1;dx<=1;dx++){const wk=a*(dx===0&&dy===0?1:(dx===0||dy===0?.6:.3));const p=row+dx,p3=p*3;
-          c[p3]+=(R-c[p3])*wk;c[p3+1]+=(G-c[p3+1])*wk;c[p3+2]+=(B-c[p3+2])*wk;hh[p]+=(ht-hh[p])*wk}}
+          c[p3]+=(R-c[p3])*wk;c[p3+1]+=(G-c[p3+1])*wk;c[p3+2]+=(B-c[p3+2])*wk;hh[p]+=(ht-hh[p])*wk;if(cv)cv[p]+=(1-cv[p])*wk}}
       }}
-    if(this.snaps&&this.strokes%this.snapEvery===0)this._snap();
+    if(this.onStroke)this.onStroke(this);
   }
   // a short dab centred at logical (x,y)
   dab(x,y,ang,len,w,col,o={}){const S=this.S;const L=len*S,n=Math.max(3,Math.round(L));const px=new Float32Array(n),py=new Float32Array(n);const k=(o.curve||0)/L;
@@ -154,9 +154,6 @@ export class Painting{
       for(let j=0;j<3;j++){let v=c[i*3+j]*s+sp;out[i*3+j]=v<=0?0:v>=1?255:Math.round(v*255)}}
     return out}
   save(file,opt){png(file,this.W,this.H,this.render(opt))}
-  // keep in-progress snapshots (for a paint-on animation later)
-  record(every,dir){this.snaps=dir;this.snapEvery=every;this.snapN=0;fs.mkdirSync(dir,{recursive:true})}
-  _snap(){png(`${this.snaps}/s${String(this.snapN++).padStart(4,'0')}.png`,this.W,this.H,this.render())}
 }
 
 // direction-field helpers (logical coords)

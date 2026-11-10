@@ -21,5 +21,5 @@ export default function(opt={}){const p=new Painting({...opt,seed:303,ground:hex
   canopy(p,150,170,150,3,{sh:30});canopy(p,960,900,190,5,{sh:36,cols:[hex('#1f4a34'),hex('#2f6a3a'),hex('#6fa044')]});canopy(p,985,560,70,8,{sh:16});
   // footprints behind the walker, and the walker
   const sp=spline(path,false,8);for(let i=4;i<34;i++){const a=sp[i],b=sp[i+1];const an=Math.atan2(b[1]-a[1],b[0]-a[0]);const k=i%2?1:-1;p.dab(a[0]-Math.sin(an)*7*k,a[1]+Math.cos(an)*7*k,an,11,4.5,hex('#9a7444'),{opacity:.8,thick:.6})}
-  const q=sp[36],q2=sp[38];person(p,{x:q[0],y:q[1],rot:Math.atan2(q2[1]-q[1],q2[0]-q[0])+Math.PI/2,s:1.75,top:C.vermilion,bottom:C.white,turban:C.gold,skin:SKIN[1],arms:[[-18,2],[17,12]],stride:7,shadow:7});
+  const q=sp[36],q2=sp[38];person(p,{x:q[0],y:q[1],rot:Math.atan2(q2[1]-q[1],q2[0]-q[0])+Math.PI/2,s:1.75,top:C.vermilion,bottom:C.white,turban:C.gold,skin:SKIN[1],arms:[[-18,2],[17,12]],stride:7,kurta:true});
   return p}

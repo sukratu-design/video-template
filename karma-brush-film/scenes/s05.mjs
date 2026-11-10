@@ -22,7 +22,7 @@ export default function(opt={}){const p=new Painting({...opt,seed:505,ground:hex
   for(let i=0;i<6;i++)p.dab(476-i*34,650+i*33,-.775,30-i*3,3.5,C.white,{opacity:.75-i*.1,dry:1.2,thick:.8});
   // the archer side-on to the target: bow arm out, string hand drawn back, an arrow on the string
   const ax=215,ay=850,fa=-.775;const bc=[ax+96,ay-128],nock=[ax+8,ay-52];
-  person(p,{x:ax,y:ay,rot:.12,s:2.5,top:C.white,bottom:hex('#e3d3b0'),turban:C.indigo,skin:SKIN[1],reach:[nock,bc],stride:8,shadow:6,sash:C.vermilion});
+  person(p,{x:ax,y:ay,rot:.12,s:2.5,top:C.white,bottom:hex('#e3d3b0'),turban:C.indigo,skin:SKIN[1],reach:[nock,bc],stride:8,kurta:true,sash:C.vermilion});
   const bow=[];for(let i=-5;i<=5;i++){const t=i/5;const off=34*(1-t*t)-34;bow.push([bc[0]+Math.cos(fa)*off-Math.sin(fa)*t*125,bc[1]+Math.sin(fa)*off+Math.cos(fa)*t*125])}
   p.line(bow.map(([x,y])=>[x+SUN[0]*14,y+SUN[1]*14]),{w:7,col:hex('#5a5a3a'),opacity:.5,thick:.2});
   p.line(bow,{w:9,col:hex('#7a4424'),thick:1.5,tone:.1});p.line(bow.slice(1,10),{w:2.5,col:hex('#c98a4a'),thick:1.6,opacity:.8});
