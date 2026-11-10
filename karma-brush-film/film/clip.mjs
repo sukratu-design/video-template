@@ -27,10 +27,10 @@ function dress(out,f){const t=f/FPS;let ba=0;for(const c of cues){const a=Math.m
   if(title){const a=i===1?1-smooth(LEAD-.1,LEAD+.7,t):smooth(DURATION-2.2,DURATION-.9,t);over(out,title,a)}return out}
 // cover lead (beat 1 only): the finished evening painting with the title, so frame 0 works as the thumbnail
 for(let f=f0;f<fs0;f++)await write(dress(shoot(prev,f),f));
-// paint-on: run the scene again and take a frame whenever the stroke count reaches that frame's share
-const frames=[];let k=0;const share=j=>{const u=(j+1)/FP;return Math.round(total*(1-Math.pow(1-u,2.3)))} // grounds go down fast, the subject gets the time;
+// paint-on (grounds go down fast so the subject gets the time; bare ground between strokes turns over early): run the scene again and take a frame whenever the stroke count reaches that frame's share
+const frames=[];let k=0;const share=j=>{const u=(j+1)/FP;return Math.round(total*(1-Math.pow(1-u,2.3)))};
 const mixb=Buffer.alloc(N*3);
-const snap=p=>{const lit=p.render(),cv=p.cov;const fade=smooth(.12,.55,(k+1)/FP); // bare ground between strokes turns over early, so no old picture shows through the gapsfor(let n=0,o=0;n<N;n++,o+=3){let a=cv[n];a=a+(1-a)*fade;mixb[o]=prev[o]+(lit[o]-prev[o])*a;mixb[o+1]=prev[o+1]+(lit[o+1]-prev[o+1])*a;mixb[o+2]=prev[o+2]+(lit[o+2]-prev[o+2])*a}
+const snap=p=>{const lit=p.render(),cv=p.cov;const fade=smooth(.12,.55,(k+1)/FP);for(let n=0,o=0;n<N;n++,o+=3){let a=cv[n];a=a+(1-a)*fade;mixb[o]=prev[o]+(lit[o]-prev[o])*a;mixb[o+1]=prev[o+1]+(lit[o+1]-prev[o+1])*a;mixb[o+2]=prev[o+2]+(lit[o+2]-prev[o+2])*a}
   frames.push(dress(shoot(mixb,fs0+k),fs0+k));k++};
 await load(scenes[i-1],{onStroke:p=>{while(k<FP-1&&p.strokes>=share(k))snap(p)}});
 for(const fr of frames)await write(fr);
