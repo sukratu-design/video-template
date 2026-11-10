@@ -5,7 +5,7 @@ const i=+process.argv[2];const SC=+(process.env.SCALE||2),OUT=1080,W=1080*SC;con
 const load=async([n,o],extra={})=>(await import(`../scenes/s${n}.mjs`)).default({scale:SC,...o,...extra});
 const smooth=(a,b,x)=>{const t=Math.min(1,Math.max(0,(x-a)/(b-a)));return t*t*(3-2*t)};
 const t0=LEAD+B[i-1],t1=i<13?LEAD+B[i]:DURATION;const f0=i===1?0:Math.round(t0*FPS),f1=Math.round(t1*FPS),fs0=Math.round(t0*FPS);
-const paintT=Math.min(3.4,Math.max(2.2,(t1-t0)*.52));const FP=Math.round(paintT*FPS);
+const paintT=Math.min(3.0,Math.max(2.0,(t1-t0)*.45));const FP=Math.round(paintT*FPS);
 const T=Date.now();
 const prev=(await load(scenes[(i+11)%13])).render();                    // what is on the canvas when this beat begins
 const full=await load(scenes[i-1]);const total=full.strokes,fin=full.render();
@@ -22,15 +22,15 @@ function shoot(src,f){const c=cam(f);const out=Buffer.alloc(OUT*OUT*3);const spa
       r+=src[p]*w00+src[p+3]*w10+src[q]*w01+src[q+3]*w11;g+=src[p+1]*w00+src[p+4]*w10+src[q+1]*w01+src[q+4]*w11;b+=src[p+2]*w00+src[p+5]*w10+src[q+2]*w01+src[q+5]*w11}}
     const o=(y*OUT+x)*3;out[o]=r/4+.5;out[o+1]=g/4+.5;out[o+2]=b/4+.5}return out}
 function over(out,img,a,yFrom=0){if(a<=.003)return;for(let p=yFrom*OUT,o=p*3,q=p*4;p<OUT*OUT;p++,o+=3,q+=4){const al=img[q+3]*a/255;if(al<=0)continue;out[o]+=(img[q]-out[o])*al;out[o+1]+=(img[q+1]-out[o+1])*al;out[o+2]+=(img[q+2]-out[o+2])*al}}
-function dress(out,f){const t=f/FPS;let ba=0;for(const c of cues){const a=Math.min(smooth(c[0]+LEAD-.35,c[0]+LEAD,t),1-smooth(c[1]+LEAD,c[1]+LEAD+.45,t));if(a>ba)ba=a}over(out,band,ba,760);
+function dress(out,f){const t=f/FPS;let ba=0;for(const c of cues){const a=Math.min(smooth(c[0]+LEAD-.35,c[0]+LEAD,t),1-smooth(c[1]+LEAD,c[1]+LEAD+.45,t));if(a>ba)ba=a}over(out,band,ba,840);
   for(const c of myCues)over(out,c[3],Math.min(smooth(c[0]-.05,c[0]+.2,t),1-smooth(c[1]-.12,c[1]+.1,t)),820);
   if(title){const a=i===1?1-smooth(LEAD-.1,LEAD+.7,t):smooth(DURATION-2.2,DURATION-.9,t);over(out,title,a)}return out}
 // cover lead (beat 1 only): the finished evening painting with the title, so frame 0 works as the thumbnail
 for(let f=f0;f<fs0;f++)await write(dress(shoot(prev,f),f));
 // paint-on: run the scene again and take a frame whenever the stroke count reaches that frame's share
-const frames=[];let k=0;const share=j=>{const u=(j+1)/FP;return Math.round(total*(.25*u+.75*u*u*(3-2*u)))};
+const frames=[];let k=0;const share=j=>{const u=(j+1)/FP;return Math.round(total*(1-Math.pow(1-u,2.3)))} // grounds go down fast, the subject gets the time;
 const mixb=Buffer.alloc(N*3);
-const snap=p=>{const lit=p.render(),cv=p.cov;const fade=smooth(.72,1,(k+1)/FP);for(let n=0,o=0;n<N;n++,o+=3){let a=cv[n];a=a+(1-a)*fade;mixb[o]=prev[o]+(lit[o]-prev[o])*a;mixb[o+1]=prev[o+1]+(lit[o+1]-prev[o+1])*a;mixb[o+2]=prev[o+2]+(lit[o+2]-prev[o+2])*a}
+const snap=p=>{const lit=p.render(),cv=p.cov;const fade=smooth(.12,.55,(k+1)/FP); // bare ground between strokes turns over early, so no old picture shows through the gapsfor(let n=0,o=0;n<N;n++,o+=3){let a=cv[n];a=a+(1-a)*fade;mixb[o]=prev[o]+(lit[o]-prev[o])*a;mixb[o+1]=prev[o+1]+(lit[o+1]-prev[o+1])*a;mixb[o+2]=prev[o+2]+(lit[o+2]-prev[o+2])*a}
   frames.push(dress(shoot(mixb,fs0+k),fs0+k));k++};
 await load(scenes[i-1],{onStroke:p=>{while(k<FP-1&&p.strokes>=share(k))snap(p)}});
 for(const fr of frames)await write(fr);
