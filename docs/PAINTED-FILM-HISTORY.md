@@ -49,6 +49,16 @@
 
 - **Final (locked 9 Nov):** 85.5 s = 1.5 s cover lead (title over frame 10, so the upload can use frame 0 as thumbnail) + 84 s film. Sound effects removed; closing line "That is why there is a gap between Dussehra and Diwali."; the map line names the Ganga and Yamuna. Score: a code-synthesized Raga Bhupali was rejected by ear ("the audio isn't good"); two ElevenLabs Music v2.5 tracks (sitar-led and bansuri-led Raga Yaman, 12.21 credits each) were generated and the bansuri one chosen. Final `vo.mp3` and `music.mp3` are committed so the locked film can be re-rendered exactly.
 
+## Fourth film: karma again, painted in code with brushes (Nov 2026)
+`karma-brush-film/`, 73.9 s, 13 beats, approved at v2 in one session. The user wanted frames made "completely in code in brushes and paint" after a reference post (paintings made by a program that places every stroke through a simulated paint engine).
+- **Engine, not drawing:** `engine/paint.mjs` works on raw pixel buffers in plain Node (no browser). A stroke is a bundle of bristles with their own tone, load and thickness; a height map is lit at the end for impasto. 5,000-35,000 strokes per frame, 3-7 s per 2160 px frame.
+- **Pictures re-imagined, narration kept:** every beat became a scene seen from above with small figures (gift, seed in earth, worn path, pot of seeds, archer, mango tree, rangoli, ox at the press, saris, swept yard, seeds on the fire, the open circle). The user approved the contact sheet direction without changes to the beats.
+- **People:** the first figures read as dolls lying flat. What fixed it: foreshortened bodies with the head over the shoulders, and a long shadow projected from the feet along the sun direction.
+- **Paint-on film:** `film/clip.mjs` re-runs each scene and takes a frame whenever the stroke count reaches that frame's share, compositing over the previous beat's finished painting through a coverage map. Grounds are scheduled fast so subjects get time. Clips render 4 at a time (~10 min total), then `film/build.sh` joins and mixes.
+- **Pitfall:** an inline `//` comment added mid-line in the one-line code style commented out the compositing loop and blacked out a whole render. Check sampled frames after every render.
+- **Voice:** reused the approved karma track. The user heard saṃskāra mispronounced although the TTS text was already संस्कार; five spellings were generated as one comparison clip, and a fresh take of the same spelling was chosen and spliced in (`vo.mp3`). The agent cannot hear audio, so pronunciation choices go to the user as labelled comparison clips.
+- **Music:** the bansuri track from the Dussehra film is reused; no credits were spent on this film.
+
 ## Open items
 - Redraw the hands (beats 1 and 13); recolour the bow; fix beat 4's opening zoom.
 - Make the voiceover pipeline a single script (currently JS generation + Python assembly).

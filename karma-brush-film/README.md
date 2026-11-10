@@ -1,6 +1,6 @@
 # karma-brush-film: karma, painted in code with brushes and paint
 
-**Status: first full cut (73.9 s, 1080×1080) out for review.** Voice: `vo.mp3`, the approved karma narration (Sarvam `bulbul:v4-flash`, `shubh_en_narration`) with line 2 re-taken for the pronunciation of saṃskāra (`voiceover/samskara.mjs`, take A_t1, placed at 3.88 s); committed because Sarvam takes are not reproducible. Music: placeholder, the bansuri track from `../dussehra-diwali-film/music.mp3`.
+**Status: APPROVED 10 Nov 2026 (v2).** 73.9 s, 1080×1080, H.264 CRF 12, AAC 192k, −16 LUFS (sha256 prefix `d9494198662fdf4a`). Voice: `vo.mp3`, the approved karma narration (Sarvam `bulbul:v4-flash`, `shubh_en_narration`) with line 2 re-taken for the pronunciation of saṃskāra (`voiceover/samskara.mjs`, take A_t1, placed at 3.88 s); committed because Sarvam takes are not reproducible. Music: placeholder, the bansuri track from `../dussehra-diwali-film/music.mp3`.
 
 Thirteen 2160×2160 paintings for the karma script (`../painted-film/brief/SCRIPT.md`, narration unchanged, pictures re-imagined as scenes seen from above). No image model: every mark is a brush stroke placed by `engine/paint.mjs`.
 
