@@ -4,6 +4,9 @@
   "credentials": {
     "local": {
       "use": "@hypit/credential-store-local"
+    },
+    "env": {
+      "use": "@hypit/credential-store-env"
     }
   },
   "endpoints": {
@@ -31,8 +34,8 @@
       "pool": "monid.default",
       "config": {
         "apiKey": {
-          "store": "local",
-          "key": "monid.api-key"
+          "store": "env",
+          "key": "MONID_API_KEY"
         },
         "defaultConcurrency": 3,
         "pollIntervalMs": 10000
