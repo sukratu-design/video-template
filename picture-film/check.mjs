@@ -32,6 +32,7 @@ F.beats.forEach((b, i) => {
   const [z0, x0, y0] = c.from, [z1, x1, y1] = c.to, zmax = b.journey ? 1.7 : 1.16;
   if (Math.min(z0, z1) < 1) fail(`beat ${n}: zoom below 1 shows outside the painting`);
   if (Math.max(z0, z1) > zmax) fail(`beat ${n}: zoom ${Math.max(z0, z1)} is over ${zmax}. Past that the pen line goes soft${b.journey ? '' : ' (journey:true allows up to 1.7 for maps and routes)'}`);
+  for (const [nm, z, v] of [['from', z0, x0], ['from', z0, y0], ['to', z1, x1], ['to', z1, y1]]) if (Math.abs(eff(z, v) - v) > .13) { warn(`beat ${n}: cam ${nm} aims at ${v} but at zoom ${z} the focus can only reach ${(.5 / z).toFixed(2)}-${(1 - .5 / z).toFixed(2)}. The move will be smaller than the "why" says; a subject near the edge needs a pan at higher zoom, or a painting composed with it nearer the centre`); break; }
   if (!T) return;
   const d = T.beats[i + 1] - T.beats[i];
   const pan = Math.hypot((eff(z1, x1) * z1 - eff(z0, x0) * z0), (eff(z1, y1) * z1 - eff(z0, y0) * z0)) * 1080, dz = Math.abs(z1 - z0);
@@ -69,7 +70,8 @@ if (!music) warn('no music.mp3: generate a score (see README "Score"). Do not sy
 else if (T && music < T.film - 6) warn(`music.mp3 (${music.toFixed(0)}s) ends ${(T.film - music).toFixed(0)}s before the film does`);
 if (F.lead > 0 && !(F.cover && existsSync(path.join(film.dir, F.cover)))) fail('lead > 0 but the cover image is missing: run cover.mjs');
 // ---- paintings and captions, measured in the page ----
-if (!out.FAIL.some(m => /missing|no cam|timing/.test(m))) {
+if (out.FAIL.some(m => /painting .* is missing|no cam|no timing|timing\.js has/.test(m))) warn('painting and caption measurements were skipped because of the FAIL lines above; fix those and run again');
+else {
   const { page, close } = await openFilm(film);
   const frames = await page.evaluate(() => window.frameReport()), caps = await page.evaluate(() => window.captionReport());
   await close();

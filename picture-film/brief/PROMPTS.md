@@ -1,10 +1,10 @@
 # Prompt blocks
 
-Paste these unchanged. Only the **Scene** paragraph and the character sheet are written per film. Save the final prompts in the film's own `brief/IMAGE-PROMPTS.md`.
+Paste these unchanged. Only the **Scene** paragraph and the character sheet are written per film. Save the final prompts in the film's own `brief/IMAGE-PROMPTS.md`: one section per painting, the accepted prompt first, then a line per re-roll saying what was wrong and what was changed. Keep every raw try in `frames/raw/` (gitignored).
 
 ## Tool settings (Higgsfield connector)
 - `generate_image`, `model: "gpt_image_2_6"`, `aspect_ratio: "1:1"`, `resolution: "2k"`, `quality: "high"`, `count: 1`. Confirm the parameter names with `models_explore` before the first call, and preflight once with `get_cost: true` (2.75 credits a frame when this was written).
-- **Style reference:** attach `brief/style-reference.png` to every frame as the only reference image (`medias: [{ role: "image", value: <media id> }]`). Upload it with `media_upload` / `media_confirm`; in the original account it already exists as media `7a05ab3e-cf47-4794-a9bf-a83f96841e4f`.
+- **Style reference:** attach `brief/style-reference.png` to every frame as the only reference image (`medias: [{ role: "image_references", value: <media id> }]`; the role name comes from `models_explore` and was `image_references` in November 2026). Upload it with `media_upload` / `media_confirm`; in the original account it already exists as media `7a05ab3e-cf47-4794-a9bf-a83f96841e4f`.
 - **Never attach a second reference of generated people.** Every job that did was blocked by the content filter. Consistency comes from repeating the character sheet word for word. A second reference is fine for non-people (a map re-roll took the first map as reference).
 - At most four jobs at once. Blocked and rate-limited jobs are not charged.
 - Other models were compared and turned down for this look (see `golden/rejected.jpg`): Nano Banana (flat, doll-like), FLUX 3 (heavy, dark, devotional-print).
@@ -38,13 +38,16 @@ Notes on writing scenes:
 - Name objects with their period word and a gloss: "kalash", "chhatra", "paduka".
 - For a map: describe the real coastline and where each place sits; ask for "no lettering".
 - For night: "a night scene as a soft-edged vignette on the same cream paper".
+- Place the subject of the line: "the central figure stands in the middle of the sheet". The camera cannot reach the edges.
+- If the first try is sparse, add onlookers and two or three more period objects, and ask for the scene to fill the middle 60% of the sheet's height.
+- Books and manuscripts: add "pages shown blank or with plain ruled lines, no script".
 - If a scene is blocked by the filter, move to the moment after the dangerous one, and say what the figure is doing calmly.
 
 ## Avoid block (every frame, last paragraph)
 > Avoid: any text, letters, numbers, signature or watermark; a border, mount or frame; photorealism; 3D render; glossy or neon colours; pure black; full-bleed dark background; anime or cartoon style; modern clothing; distorted faces, extra fingers or malformed feet.
 
 ## Score (Higgsfield `generate_audio`)
-`model: "elevenlabs_music_v2_5"`, `duration: <film length in seconds, without the cover lead>`, `force_instrumental: true`. About 12 credits each. Generate two with different lead instruments and let the user choose. The prompt that produced the chosen score of the Dussehra film (change the raga, mood and timings to suit; keep the structure and the last two sentences):
+`model: "elevenlabs_music_v2_5"`, `duration: <film length in seconds, without the cover lead>`, `force_instrumental: true`. Cost scales with length: 4.4 credits for 30 s, about 12 for 84 s. Generate two with different lead instruments and let the user choose. The prompt that produced the chosen score of the Dussehra film (change the raga, mood and timings to suit; keep the structure and the last two sentences):
 
 > Uplifting, luminous Indian classical instrumental led by BANSURI (bamboo flute) for a festive Diwali story film; background score under a spoken narration. Raga Yaman (evening raga, tivra Ma), joyful and devotional. The bansuri carries the melody throughout with breathy tone, meend glides and gentle ornaments; soft sitar and santoor answer and accompany underneath; tanpura drone throughout; tabla in a gentle teentaal (madhya laya, about 90 bpm). Structure: 0-10 s a short, hopeful bansuri alap over tanpura; 10-70 s the tabla enters and the bansuri rises into a bright, warm, uplifting gat with growing energy but never busy, leaving space for a voice; 70-84 s a radiant, celebratory resolution where the bansuri settles and ends on Sa over a sustained tanpura and a soft santoor shimmer. Warm, acoustic, intimate concert sound, no vocals, no electronic drums, no synth pads, no Western orchestra.
 

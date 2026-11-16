@@ -58,6 +58,13 @@
 - **Review sheets.** `contact.mjs` writes all raw paintings on one sheet and three stills per beat, to be compared with the golden sheets.
 - The locked film folder is unchanged. The style reference already exists in the Higgsfield account as media `7a05ab3e-cf47-4794-a9bf-a83f96841e4f`.
 
+### Dry run with Opus (16 Nov 2026)
+An Opus subagent made a four-beat, 31.5 s Makar Sankranti film (`picture-film/films/makar-sankranti/`) from the skill alone, with no human at the gates. 7 paintings (4 kept) and one score: 23.6 Higgsfield credits.
+- **What held:** it caught every planted error in the draft (not "always January 14", not the winter solstice, kites are regional, the "58 days" dropped as unverified), the paintings match the golden set's paper, line and palette, it named its weakest frames, and it said it had not heard the audio.
+- **What it found, now fixed:** `check.mjs` silently skipped the painting checks while the cover was missing and `contact.mjs` crashed; the reference role is `image_references`; a score costs about 4 credits per 30 s; the example brief described the code-drawn version; the camera's small reach was not explained, so first-guess `why` lines described impossible moves.
+- **Its best idea, now built in:** it ran each voice take through Sarvam speech-to-text and found the median-length pick had chosen garbled takes on two of four lines ("Makkah, Kakron"). `vo.mjs build` now transcribes every take and picks by transcript match; on the same takes it chooses the takes the agent chose by hand.
+- **Where it fell short of the earlier films (reviewer's view):** it corrected the draft's facts but kept its structure, so the kite beat does not serve the answer; and the paintings are sparser than the golden set. `TASTE.md` and the rubric now cover both. The film is kept as a trial record, not a reference; nobody has listened to it.
+
 ## Open items
 - Redraw the hands (beats 1 and 13); recolour the bow; fix beat 4's opening zoom.
 - (Done in `picture-film/voiceover/vo.mjs`.) Make the voiceover pipeline a single script.

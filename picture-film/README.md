@@ -45,7 +45,7 @@ Playwright and Chromium are preinstalled in cloud sessions (never run `playwrigh
 - `lead`: seconds the cover holds before the film; the audio is delayed by the same amount.
 
 ## Voice
-`vo.mjs build` trims each take, shortens long pauses to 0.38 s, lays lines out with 0.6 s breaths between beats, and derives beat boundaries and caption cues from the audio. It picks the median-length take of three; to override, write `films/<slug>/voiceover/picks.json` as `{"3": 2}` (line 3, take 2) and build again. To redo one line: `vo.mjs <film> takes 3`. Takes are not committed; `vo.mp3` is.
+`vo.mjs build` trims each take, shortens long pauses to 0.38 s, lays lines out with 0.6 s breaths between beats, and derives beat boundaries and caption cues from the audio. It transcribes each take (Sarvam speech-to-text, cached in `voiceover/takes/transcripts.json`), picks the take whose transcript best matches the caption (the median-length one among equals) and prints every transcript; `--no-stt` skips this. To override, write `films/<slug>/voiceover/picks.json` as `{"3": 2}` (line 3, take 2) and build again. To redo one line: `vo.mjs <film> takes 3`. Takes are not committed; `vo.mp3` is.
 
 ## Score
 `music.mp3` in the film folder is mixed under the voice automatically (sidechain-ducked, 2.5 s fade at the end). Generate it; see `brief/PROMPTS.md`. A score synthesized in code was tried and rejected.

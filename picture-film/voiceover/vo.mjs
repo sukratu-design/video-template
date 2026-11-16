@@ -1,7 +1,8 @@
 // Voiceover pipeline in one script. The voice drives the timing, never the reverse.
 //   node voiceover/vo.mjs <film> estimate         timing.js from word counts (no API calls), to preview and budget length
 //   node voiceover/vo.mjs <film> takes [i,j,...]  3 Sarvam takes per line into <film>/voiceover/takes/  (optional: only those line numbers)
-//   node voiceover/vo.mjs <film> build            pick takes, assemble <film>/vo.mp3, write <film>/timing.js
+//   node voiceover/vo.mjs <film> build            transcribe + pick takes, assemble <film>/vo.mp3, write <film>/timing.js
+//                                                  (--no-stt skips the transcription check)
 // Line numbers count every lines[] entry across beats, from 0. To override the automatic pick, write
 // <film>/voiceover/picks.json as {"3": 2, "7": 0} (line -> take) and build again.
 // Key: SARVAM_API_KEY in the environment, or ~/.sarvam.env. Never commit or paste it.
@@ -81,6 +82,29 @@ function processTake(x) { // trim the ends, shorten long inner pauses to SENTENC
 }
 const pausesOf = x => { const m = mask(x); return runs(m).filter(([a, b]) => a > 0 && b < m.length && (b - a) * FR / SR >= 0.3).map(([a, b]) => (a + b) / 2 * FR / SR); };
 
+const sarvamKey = () => {
+  const key = (process.env.SARVAM_API_KEY || (fs.existsSync(process.env.HOME + '/.sarvam.env') ? (fs.readFileSync(process.env.HOME + '/.sarvam.env', 'utf8').match(/SARVAM_API_KEY=(.+)/) || [])[1] : '') || '').trim();
+  if (!key) throw new Error('SARVAM_API_KEY missing (environment variable or ~/.sarvam.env)');
+  return key;
+};
+// Speech-to-text stands in for ears: a take that drops or garbles a word shows up in its transcript.
+// (The first trial's median-length pick chose garbled takes on 2 of 4 lines; transcripts caught both.)
+async function transcribe(file) { // one take at a time: the API rejects audio over 30 s
+  const fd = new FormData();
+  fd.append('file', new Blob([fs.readFileSync(file)], { type: 'audio/mpeg' }), path.basename(file));
+  fd.append('model', 'saarika:v2.5'); fd.append('language_code', 'en-IN');
+  const r = await fetch('https://api.sarvam.ai/speech-to-text', { method: 'POST', headers: { 'api-subscription-key': sarvamKey() }, body: fd });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || typeof j.transcript !== 'string') throw new Error(r.status + ' ' + JSON.stringify(j).slice(0, 200));
+  return j.transcript;
+}
+const tokens = s => s.toLowerCase().replace(/(\d+)(st|nd|rd|th)\b/g, '$1').replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean);
+function similarity(a, b) { // share of words in common (order ignored), 0..1
+  const A = tokens(a), B = tokens(b), left = [...B]; let hit = 0;
+  for (const w of A) { const k = left.indexOf(w); if (k >= 0) { hit++; left.splice(k, 1); } }
+  return A.length + B.length ? 2 * hit / (A.length + B.length) : 0;
+}
+
 if (cmd === 'estimate') {
   const durs = lines.map(l => words(l.captions.join(' ')) / EST_WPM * 60 + 0.38 * Math.max(0, (l.captions.join(' ').match(/[.?!]/g) || []).length - 1));
   const L = layout(durs);
@@ -88,8 +112,7 @@ if (cmd === 'estimate') {
   report(L, durs);
   console.log('\ntiming.js written (estimated). Stills and camera previews work; render.mjs will refuse it for a final.');
 } else if (cmd === 'takes') {
-  const key = (process.env.SARVAM_API_KEY || (fs.existsSync(process.env.HOME + '/.sarvam.env') ? (fs.readFileSync(process.env.HOME + '/.sarvam.env', 'utf8').match(/SARVAM_API_KEY=(.+)/) || [])[1] : '') || '').trim();
-  if (!key) throw new Error('SARVAM_API_KEY missing (environment variable or ~/.sarvam.env)');
+  const key = sarvamKey();
   fs.mkdirSync(takesDir, { recursive: true });
   const only = extra ? extra.split(',').map(Number) : lines.map((_, i) => i);
   const tts = async (text, out) => {
@@ -110,16 +133,35 @@ if (cmd === 'estimate') {
 } else if (cmd === 'build') {
   const picksFile = path.join(film.dir, 'voiceover', 'picks.json');
   const picks = fs.existsSync(picksFile) ? JSON.parse(fs.readFileSync(picksFile, 'utf8')) : {};
-  const chosen = [], info = [];
-  lines.forEach((l, i) => {
-    const takes = Array.from({ length: TAKES }, (_, t) => path.join(takesDir, `l${i}_t${t}.mp3`)).map((f, t) => (fs.existsSync(f) ? { t, x: processTake(load(f)) } : null)).filter(Boolean);
+  const chosen = [], info = [], heard = [];
+  const useStt = !process.argv.includes('--no-stt');
+  const cacheFile = path.join(takesDir, 'transcripts.json');
+  const cache = fs.existsSync(cacheFile) ? JSON.parse(fs.readFileSync(cacheFile, 'utf8')) : {};
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i], want = l.captions.join(' ');
+    const takes = [];
+    for (let t = 0; t < TAKES; t++) {
+      const f = path.join(takesDir, `l${i}_t${t}.mp3`); if (!fs.existsSync(f)) continue;
+      const k = { t, x: processTake(load(f)), text: null, score: 1 };
+      if (useStt) {
+        const id = `l${i}_t${t}:${fs.statSync(f).size}`;
+        try { k.text = cache[id] ?? (cache[id] = await transcribe(f)); k.score = similarity(want, k.text); }
+        catch (e) { console.log(`transcription failed for line ${i} take ${t}: ${e.message.slice(0, 100)}`); }
+      }
+      takes.push(k);
+    }
     if (!takes.length) throw new Error(`no takes for line ${i}: run "takes" first`);
-    const sorted = [...takes].sort((a, b) => a.x.length - b.x.length);
-    // Default pick: the median-length take (the short one is usually rushed or dropped a word, the long one drags).
-    const pick = picks[i] !== undefined ? takes.find(k => k.t === picks[i]) : sorted[Math.floor((sorted.length - 1) / 2 + 0.5)];
+    // Pick: the take whose transcript is closest to the caption text; among near-equals, the median length
+    // (the short one is usually rushed or dropped a word, the long one drags).
+    const best = Math.max(...takes.map(k => k.score));
+    const pool = takes.filter(k => k.score >= best - 0.03).sort((a, b) => a.x.length - b.x.length);
+    const pick = picks[i] !== undefined ? takes.find(k => k.t === picks[i]) : pool[Math.floor((pool.length - 1) / 2 + 0.5)];
     if (!pick) throw new Error(`picks.json asks for take ${picks[i]} of line ${i}, which does not exist`);
-    chosen.push(pick.x); info.push(takes.map(k => (k.x.length / SR).toFixed(1) + (k.t === pick.t ? '*' : ' ')).join(' '));
-  });
+    chosen.push(pick.x); heard.push(pick);
+    info.push(takes.map(k => (k.x.length / SR).toFixed(1) + (k.t === pick.t ? '*' : ' ')).join(' '));
+    if (useStt) { console.log(`line ${i} wanted: ${want}`); takes.forEach(k => console.log(`   take ${k.t}${k.t === pick.t ? '*' : ' '} ${(k.score * 100).toFixed(0).padStart(3)}%  ${k.text ?? '(no transcript)'}`)); }
+  }
+  if (useStt) { fs.writeFileSync(cacheFile, JSON.stringify(cache, null, 1)); console.log(''); }
   const durs = chosen.map(x => x.length / SR), L = layout(durs, chosen.map(pausesOf));
   const mix = new Float32Array(Math.round(L.filmLen * SR));
   chosen.forEach((x, i) => { const s = Math.round(L.starts[i] * SR); for (let k = 0; k < x.length && s + k < mix.length; k++) mix[s + k] += x[k]; });
@@ -131,7 +173,9 @@ if (cmd === 'estimate') {
   report(L, durs, i => '  takes ' + info[i]);
   const bad = lines.map((l, i) => [i, Math.round(words(l.captions.join(' ')) / durs[i] * 60)]).filter(([i, w]) => words(lines[i].captions.join(' ')) >= 8 && (w < 105 || w > 170)); // short lines measure unreliably
   if (bad.length) console.log('\nPACE WARNING (the accepted film runs 110-165 wpm per line): ' + bad.map(([i, w]) => `line ${i} at ${w} wpm`).join(', ') + '. Re-take those lines or reword; do not speed audio up.');
-  console.log(`\npeak ${peak.toFixed(2)}. vo.mp3 and timing.js written. * marks the take used. A person must listen to vo.mp3 before the render (pronunciation, pace).`);
+  const doubtful = heard.map((k, i) => [i, k.score]).filter(([, sc]) => useStt && sc < 0.8);
+  if (doubtful.length) console.log('\nTRANSCRIPT WARNING: ' + doubtful.map(([i, sc]) => `line ${i} (${(sc * 100).toFixed(0)}% match)`).join(', ') + '. Read the transcripts above: re-take the line, or respell the hard word in "say". Indic names are often transcribed differently and can be fine; missing or wrong English words are not.');
+  console.log(`\npeak ${peak.toFixed(2)}. vo.mp3 and timing.js written. * marks the take used. Transcripts are a stand-in, not ears: a person must listen to vo.mp3 before the render (pronunciation, pace).`);
 } else {
   console.log('usage: node voiceover/vo.mjs <film> estimate | takes [lines] | build');
   process.exit(1);

@@ -3,7 +3,7 @@
 //   paintings.jpg  every raw painting side by side: one hand, one paper, one palette?
 //   film-1.jpg ... three stills per beat (start, middle, end) with captions, title and closing
 //   cover.jpg      the cover, if the film has one
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { filmArg, readContent, openFilm } from './lib/film.mjs';
 const film = filmArg(process.argv[2]), F = readContent(film.dir);
@@ -29,6 +29,7 @@ const PER = 12; // 4 beats per sheet keeps each tile large enough to judge
 for (let i = 0; i < tiles.length; i += PER) save(`film-${i / PER + 1}.jpg`, await sheet(tiles.slice(i, i + PER), 3));
 const raw = await page.evaluate(dir => window.FILM.beats.map((b, i) => ({ src: new URL(dir + '/' + b.image, location.href).href, label: `painting ${i + 1}  ${b.image}` })), film.rel);
 save('paintings.jpg', await sheet(raw, raw.length <= 6 ? 3 : raw.length <= 8 ? 4 : 5));
-if (F.lead > 0 && F.cover) save('cover.jpg', await page.evaluate(async src => { const im = new Image(); im.src = src; await im.decode(); const c = document.createElement('canvas'); c.width = c.height = 1024; c.getContext('2d').drawImage(im, 0, 0, 1024, 1024); return c.toDataURL('image/jpeg', 0.9).slice(23); }, film.rel + '/' + F.cover));
+if (F.lead > 0 && F.cover && !existsSync(path.join(film.dir, F.cover))) console.log('no cover yet (run cover.mjs); skipping qa/cover.jpg');
+else if (F.lead > 0 && F.cover) save('cover.jpg', await page.evaluate(async src => { const im = new Image(); im.src = src; await im.decode(); const c = document.createElement('canvas'); c.width = c.height = 1024; c.getContext('2d').drawImage(im, 0, 0, 1024, 1024); return c.toDataURL('image/jpeg', 0.9).slice(23); }, film.rel + '/' + F.cover));
 await close();
 console.log('\nNow LOOK at every sheet and answer the "Look" questions in RUBRIC.md, next to golden/accepted.jpg and golden/rejected.jpg.');

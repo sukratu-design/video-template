@@ -1,6 +1,6 @@
 # Dry run: the first film to make with a new model
 
-Purpose: find out where the template's instructions fall short for the model that will use them, on a film small enough to throw away. It was written on 16 Nov 2026 and has **not been run yet**. Paste the block below into a fresh session in this repository. It costs roughly 4 to 7 paintings (2.75 credits each) and one score (about 12 credits), plus a few Sarvam calls.
+Purpose: find out where the template's instructions fall short for the model that will use them, on a film small enough to throw away. It was written on 16 Nov 2026 and run once that day with Opus as a subagent (no human at the gates). The output is kept in `films/makar-sankranti/` as a record of a trial, **not as a quality reference**: nobody has listened to its voice or score, and its script has a weak fourth beat. What it taught is in `docs/PAINTED-FILM-HISTORY.md`. To run it again, use another slug. Paste the block below into a fresh session in this repository. It costs roughly 4 to 7 paintings (2.75 credits each) and one score (about 12 credits), plus a few Sarvam calls.
 
 The draft contains mistakes on purpose (see "What to look for" at the bottom; do not show that part to the model).
 

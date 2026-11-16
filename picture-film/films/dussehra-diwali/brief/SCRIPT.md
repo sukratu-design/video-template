@@ -1,5 +1,7 @@
 # Dussehra to Diwali: "the long way home"
 
+> **Read this for the narration and the "Source and accuracy notes", which are the model for a brief.** The header line and the Picture column below describe the earlier code-drawn version (symbols only, synthesized sound), which was replaced. The pictures of the final film are in `IMAGE-PROMPTS.md`, its timing in `../timing.js`, and its closing line was added later (see `../content.js`).
+
 1080×1080 · 77.5 s · 30 fps · Company School painted watercolour · Sarvam `bulbul:v4-flash` / `shubh_en_narration` · synthesized tanpura, bells, air whooshes. No faces, no deities: every figure is named in the narration and shown only by an object. Everything is drawn in code.
 
 Beat times are set from the measured voiceover (`voiceover/assemble.py`), not the other way round.
