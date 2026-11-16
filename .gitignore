@@ -21,3 +21,6 @@ dussehra-diwali-film/music.mp3
 dussehra-diwali-film/music-*.mp3
 !dussehra-diwali-film/vo.mp3
 !dussehra-diwali-film/music.mp3
+picture-film/films/*/voiceover/takes/
+picture-film/films/*/qa/
+picture-film/films/*/video.tmp.mp4

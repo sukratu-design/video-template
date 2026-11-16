@@ -49,11 +49,20 @@
 
 - **Final (locked 9 Nov):** 85.5 s = 1.5 s cover lead (title over frame 10, so the upload can use frame 0 as thumbnail) + 84 s film. Sound effects removed; closing line "That is why there is a gap between Dussehra and Diwali."; the map line names the Ganga and Yamuna. Score: a code-synthesized Raga Bhupali was rejected by ear ("the audio isn't good"); two ElevenLabs Music v2.5 tracks (sitar-led and bansuri-led Raga Yaman, 12.21 credits each) were generated and the bansuri one chosen. Final `vo.mp3` and `music.mp3` are committed so the locked film can be re-rendered exactly.
 
+## picture-film: the image pipeline as a template (16 Nov 2026)
+`picture-film/` turns the third film's pipeline into a shared engine plus one data folder per film, written so that a different model can reach the same standard.
+- **Engine and data are separate.** `index.html?film=films/<slug>` reads `content.js` (hand-written) and `timing.js` (generated). The Dussehra film as data renders the same pixels as the locked `dussehra-diwali-film/index.html` (14 sampled frames compared by hash).
+- **One voice script.** `voiceover/vo.mjs estimate | takes | build` replaces the JS + Python steps: it picks the median-length take of three, assembles `vo.mp3` and derives beat boundaries and caption cues, so nothing is pasted by hand.
+- **Taste as files.** `TASTE.md` (judgement calls with their reasons), `golden/` (the ten accepted paintings, plus eight rejected frames with the reason each was turned down: the Nano Banana and FLUX 3 comparison frames recovered from Higgsfield history, and the code-drawn symbol version), `RUBRIC.md` (checklist, four approval gates, a report block), `brief/PROMPTS.md` (style, character, scene and avoid blocks, two full prompts that produced accepted frames, and the score prompt, recovered from the Higgsfield job).
+- **Measurable checks.** `check.mjs` fails a final render on missing sources of timing, estimated timing, missing cover, three-line captions, zoom out of range; it warns on camera speed, dead or repetitive moves, beat length, caption reading speed, busy caption or title areas and paper-tone drift. Thresholds were set so the locked film passes with no warnings.
+- **Review sheets.** `contact.mjs` writes all raw paintings on one sheet and three stills per beat, to be compared with the golden sheets.
+- The locked film folder is unchanged. The style reference already exists in the Higgsfield account as media `7a05ab3e-cf47-4794-a9bf-a83f96841e4f`.
+
 ## Open items
 - Redraw the hands (beats 1 and 13); recolour the bow; fix beat 4's opening zoom.
-- Make the voiceover pipeline a single script (currently JS generation + Python assembly).
+- (Done in `picture-film/voiceover/vo.mjs`.) Make the voiceover pipeline a single script.
 - Rotate any API key that was ever pasted into a chat.
 - Port the clean-edge compositor (and caption change) back to `painted-film/` if wanted.
 - Re-centre Diwali beats 2-10 vertically like beat 1 (a follow-up session was started).
 - Listen to the Diwali voiceover for pacing and Hindi-term pronunciation.
-- Dussehra-to-Diwali film: FINAL. Optional: port the alpha-respecting helpers and scenery library back to `diwali-film/` and `painted-film/`; consider making the image pipeline (paintings + camera + captions + generated score + cover lead) a reusable template.
+- Dussehra-to-Diwali film: FINAL. Optional: port the alpha-respecting helpers and scenery library back to `diwali-film/` and `painted-film/`; the image pipeline is now the `picture-film/` template.

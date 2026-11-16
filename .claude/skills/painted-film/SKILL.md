@@ -14,3 +14,5 @@ Template: `painted-film/`. Read `painted-film/STYLE.md`, `painted-film/README.md
 5. **Deliver** a compressed copy (`libx264 -crf 25 -c:a copy`); reference examples live in `painted-film/examples/`.
 
 Rules: seeded RNG only, animate plain objects (no dotted GSAP property names), one run at a time on small servers, don't use `until ! pgrep -f` loops.
+
+This skill is for the **code-drawn** style (symbols and diagrams, no generated images). For a painted explainer with people in it, the user's preferred look since the Dussehra film, use the `picture-film` skill instead. Its `picture-film/TASTE.md` (script, voice, captions, score) and the approval gates in `picture-film/RUBRIC.md` apply here too.
